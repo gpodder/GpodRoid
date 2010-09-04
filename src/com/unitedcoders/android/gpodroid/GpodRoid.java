@@ -1,5 +1,6 @@
 package com.unitedcoders.android.gpodroid;
 
+import com.unitedcoders.android.gpodroid.activity.AccountSettings;
 import com.unitedcoders.android.gpodroid.activity.ArchiveActivity;
 import com.unitedcoders.android.gpodroid.activity.DownloadList;
 import com.unitedcoders.android.gpodroid.activity.DownloadProgress;
@@ -12,6 +13,7 @@ import android.os.Bundle;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.TabHost;
@@ -47,8 +49,6 @@ public class GpodRoid extends TabActivity {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.menu, menu);
 		return true;
-		
-	
 	
 	}
 	
@@ -59,5 +59,14 @@ public class GpodRoid extends TabActivity {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.menu, menu);
 		menu.setHeaderTitle("Menu");
+	}
+	
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+	    // TODO Auto-generated method stub
+	    Intent intent = new Intent(this, AccountSettings.class);
+	    startActivity(intent);
+	    return true;
 	}
 }

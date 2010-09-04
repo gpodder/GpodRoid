@@ -10,6 +10,7 @@ import org.apache.http.auth.UsernamePasswordCredentials;
 import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Credentials;
 import android.net.Uri;
 import android.os.Bundle;
@@ -30,24 +31,37 @@ import com.unitedcoders.gpodder.GpodderAPI;
 import com.unitedcoders.gpodder.GpodderUpdates;
 
 public class DownloadList extends ListActivity {
-
-    final String username = "";
-    final String password = "";
+    public static final String PREFS_NAME = "gpodroidPrefs";
+    
+    private String username = "";
+    private String password = "";
+    private String device = "";
+    
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         // TODO Auto-generated method stub
         super.onCreate(savedInstanceState);
         setContentView(R.layout.downloadview);
-
+        
         final PodcastListAdapter pcla = new PodcastListAdapter(this);
 
         GpodderUpdates podcast = null;
+        
+        // get preferences
+        SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+        this.username = settings.getString("username", "");
+        this.password = settings.getString("password", "");
+        this.device = settings.getString("device", "");
+        
 
         URL url;
         // try to get the updates
         try {
-            url = new URL("http://gpodder.net/api/2/updates/nheid/hptux.json?since=1278000610");
+            String urlStr = "http://gpodder.net/api/2/updates/USERNAME/DEVICE.json?since=1278000610";
+            urlStr = urlStr.replace("USERNAME", username);
+            urlStr = urlStr.replace("DEVICE", device);
+            url = new URL(urlStr);
             URLConnection conn = url.openConnection();
             conn.setRequestProperty("Authorization", "Basic "
                     + Base64.encodeBytes((username + ":" + password).getBytes()));
