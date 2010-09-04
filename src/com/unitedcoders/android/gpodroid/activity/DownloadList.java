@@ -4,6 +4,11 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.text.Format;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+
 
 import org.apache.http.auth.UsernamePasswordCredentials;
 
@@ -14,10 +19,12 @@ import android.content.SharedPreferences;
 import android.net.Credentials;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.format.DateFormat;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.unitedcoders.android.gpodroid.Base64;
 import com.unitedcoders.android.gpodroid.PodcastElement;
@@ -32,33 +39,42 @@ import com.unitedcoders.gpodder.GpodderUpdates;
 
 public class DownloadList extends ListActivity {
     public static final String PREFS_NAME = "gpodroidPrefs";
-    
+
     private String username = "";
     private String password = "";
     private String device = "";
-    
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         // TODO Auto-generated method stub
         super.onCreate(savedInstanceState);
         setContentView(R.layout.downloadview);
-        
+
         final PodcastListAdapter pcla = new PodcastListAdapter(this);
 
         GpodderUpdates podcast = null;
-        
+
         // get preferences
         SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
         this.username = settings.getString("username", "");
         this.password = settings.getString("password", "");
         this.device = settings.getString("device", "");
-        
+
+        if (username.equals("") || password.equals("") || device.equals("")) {
+
+            Toast toast = Toast.makeText(getApplicationContext(), "please enter your settings first",
+                    Toast.LENGTH_SHORT);
+            
+            return;
+
+        }
 
         URL url;
         // try to get the updates
         try {
-            String urlStr = "http://gpodder.net/api/2/updates/USERNAME/DEVICE.json?since=1278000610";
+            Long since = (new Date().getTime() / 1000) - 3600*24*14;
+            
+            String urlStr = "http://gpodder.net/api/2/updates/USERNAME/DEVICE.json?since="+since;
             urlStr = urlStr.replace("USERNAME", username);
             urlStr = urlStr.replace("DEVICE", device);
             url = new URL(urlStr);
