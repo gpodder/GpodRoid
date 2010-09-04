@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="wrap_content" android:layout_height="wrap_content"
+	android:orientation="vertical">
+
+	<RelativeLayout android:layout_width="fill_parent"
+		android:layout_height="wrap_content" android:id="@+id/top_control_bar">
+	</RelativeLayout>
+
+	<LinearLayout android:id="@+id/bottom_control_bar"
+		android:layout_width="fill_parent" android:layout_height="wrap_content"
+		android:layout_alignParentBottom="true">
+		<Button android:id="@+id/downloadButton" android:layout_width="fill_parent"
+			android:layout_height="wrap_content" android:text="Download" />
+	</LinearLayout>
+
+
+	<ListView android:id="@+id/android:list" android:layout_width="fill_parent"
+		android:layout_height="0dip" android:layout_below="@id/top_control_bar"
+		android:layout_above="@id/bottom_control_bar" />
+	<TextView android:id="@android:id/empty" android:layout_width="wrap_content"
+		android:layout_height="wrap_content" android:text=""
+		android:layout_below="@id/top_control_bar" android:layout_above="@id/bottom_control_bar" />
+
+
+</RelativeLayout>
+
+

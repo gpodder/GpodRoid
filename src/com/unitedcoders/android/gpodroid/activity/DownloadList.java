@@ -1,0 +1,98 @@
+package com.unitedcoders.android.gpodroid.activity;
+
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
+
+import org.apache.http.auth.UsernamePasswordCredentials;
+
+import android.app.AlertDialog;
+import android.app.ListActivity;
+import android.content.Intent;
+import android.net.Credentials;
+import android.net.Uri;
+import android.os.Bundle;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
+import android.widget.ListView;
+
+import com.unitedcoders.android.gpodroid.Base64;
+import com.unitedcoders.android.gpodroid.PodcastElement;
+import com.unitedcoders.android.gpodroid.PodcastListAdapter;
+import com.unitedcoders.android.gpodroid.R;
+import com.unitedcoders.android.gpodroid.R.id;
+import com.unitedcoders.android.gpodroid.R.layout;
+import com.unitedcoders.android.gpodroid.services.DownloadService;
+import com.unitedcoders.android.gpodroid.services.PlayerService;
+import com.unitedcoders.gpodder.GpodderAPI;
+import com.unitedcoders.gpodder.GpodderUpdates;
+
+public class DownloadList extends ListActivity {
+
+    final String username = "";
+    final String password = "";
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        // TODO Auto-generated method stub
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.downloadview);
+
+        final PodcastListAdapter pcla = new PodcastListAdapter(this);
+
+        GpodderUpdates podcast = null;
+
+        URL url;
+        // try to get the updates
+        try {
+            url = new URL("http://gpodder.net/api/2/updates/nheid/hptux.json?since=1278000610");
+            URLConnection conn = url.openConnection();
+            conn.setRequestProperty("Authorization", "Basic "
+                    + Base64.encodeBytes((username + ":" + password).getBytes()));
+            // + BasicAuth.encode(username, password));
+            GpodderAPI api = new GpodderAPI("", "");
+            podcast = api.parseResponse(conn.getInputStream());
+
+        } catch (MalformedURLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // // add items to download list
+        for (int i = 0; i < podcast.getUpdates().size(); i++) {
+            pcla.addItem(new PodcastElement(podcast.getUpdates().get(i).getTitle(), podcast.getUpdates().get(i)
+                    .getUrl()));
+        }
+
+        setListAdapter(pcla);
+
+        final AlertDialog.Builder alert = new AlertDialog.Builder(this);
+        alert.setNeutralButton("let's pretend it's done", null);
+        Button downloadButton = (Button) findViewById(R.id.downloadButton);
+        final Intent intent = new Intent(this, DownloadService.class);
+        downloadButton.setOnClickListener(new OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+
+                String download = pcla.getCheckedItems().get(0).getDownloadurl().toString();
+
+                intent.putExtra("podcast", download);
+                startService(intent);
+
+                // Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(download));
+                // startActivity(intent);
+
+            }
+        });
+        //
+    }
+
+}
