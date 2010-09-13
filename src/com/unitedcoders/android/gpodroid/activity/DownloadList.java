@@ -64,6 +64,7 @@ public class DownloadList extends ListActivity {
 
             Toast toast = Toast.makeText(getApplicationContext(), "please enter your settings first",
                     Toast.LENGTH_SHORT);
+            toast.show();
             
             return;
 
