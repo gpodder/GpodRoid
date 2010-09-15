@@ -24,15 +24,24 @@ public class GpodRoid extends TabActivity {
 
     private static ArrayList<PodcastElement> downloadQueue = new ArrayList<PodcastElement>();
 
+    /**
+     * 
+     * @return next Element to download or null if empty
+     */
     public static PodcastElement getNextDownload() {
 
-        PodcastElement element = downloadQueue.get(0);
-        if (element != null) {
+        if (downloadQueue.size() > 0) {
+            PodcastElement element = downloadQueue.get(0);
             downloadQueue.remove(0);
+            return element;
         }
-        return element;
+        return null;
     }
 
+    /**
+     * Add a PocastElement to the download queue
+     * @param element   PodcastElement to add
+     */
     public static void addDownloadQueue(PodcastElement element) {
         downloadQueue.add(element);
 
