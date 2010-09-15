@@ -1,5 +1,7 @@
 package com.unitedcoders.android.gpodroid;
 
+import java.util.ArrayList;
+
 import com.unitedcoders.android.gpodroid.activity.AccountSettings;
 import com.unitedcoders.android.gpodroid.activity.ArchiveActivity;
 import com.unitedcoders.android.gpodroid.activity.DownloadList;
@@ -19,54 +21,68 @@ import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.TabHost;
 
 public class GpodRoid extends TabActivity {
-	/** Called when the activity is first created. */
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
 
-		setContentView(R.layout.main);
+    private static ArrayList<PodcastElement> downloadQueue = new ArrayList<PodcastElement>();
 
-		TabHost tabHost = getTabHost();
+    public static PodcastElement getNextDownload() {
 
-		tabHost.addTab(tabHost.newTabSpec("tab1").setIndicator("Player")
-				.setContent(new Intent(this, PlayerActivity.class)));
-		tabHost.addTab(tabHost.newTabSpec("tab2").setIndicator("Archive")
-				.setContent(new Intent(this, ArchiveActivity.class)));
-		tabHost.addTab(tabHost.newTabSpec("tab3").setIndicator("Updates")
-				.setContent(new Intent(this, DownloadList.class)));
+        PodcastElement element = downloadQueue.get(0);
+        if (element != null) {
+            downloadQueue.remove(0);
+        }
+        return element;
+    }
 
-		tabHost.setCurrentTab(0);
-		
-//		Intent intent = new Intent(this,DownloadProgress.class);
-//		startActivity(intent);
-	}
-	
-	
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// TODO Auto-generated method stub
-//		return super.onCreateOptionsMenu(menu);
-		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.menu, menu);
-		return true;
-	
-	}
-	
-	@Override
-	public void onCreateContextMenu(ContextMenu menu, View v,
-			ContextMenuInfo menuInfo) {
-		super.onCreateContextMenu(menu, v, menuInfo);
-		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.menu, menu);
-		menu.setHeaderTitle("Menu");
-	}
-	
-	
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-	    // TODO Auto-generated method stub
-	    Intent intent = new Intent(this, AccountSettings.class);
-	    startActivity(intent);
-	    return true;
-	}
+    public static void addDownloadQueue(PodcastElement element) {
+        downloadQueue.add(element);
+
+    }
+
+    /** Called when the activity is first created. */
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        setContentView(R.layout.main);
+
+        TabHost tabHost = getTabHost();
+
+        tabHost.addTab(tabHost.newTabSpec("tab1").setIndicator("Player").setContent(
+                new Intent(this, PlayerActivity.class)));
+        tabHost.addTab(tabHost.newTabSpec("tab2").setIndicator("Archive").setContent(
+                new Intent(this, ArchiveActivity.class)));
+        tabHost.addTab(tabHost.newTabSpec("tab3").setIndicator("Updates").setContent(
+                new Intent(this, DownloadList.class)));
+
+        tabHost.setCurrentTab(0);
+
+        // Intent intent = new Intent(this,DownloadProgress.class);
+        // startActivity(intent);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // TODO Auto-generated method stub
+        // return super.onCreateOptionsMenu(menu);
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu, menu);
+        return true;
+
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu, menu);
+        menu.setHeaderTitle("Menu");
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // TODO Auto-generated method stub
+        Intent intent = new Intent(this, AccountSettings.class);
+        startActivity(intent);
+        return true;
+    }
 }

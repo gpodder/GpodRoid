@@ -8,6 +8,7 @@ import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -27,6 +28,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.unitedcoders.android.gpodroid.Base64;
+import com.unitedcoders.android.gpodroid.GpodRoid;
 import com.unitedcoders.android.gpodroid.PodcastElement;
 import com.unitedcoders.android.gpodroid.PodcastListAdapter;
 import com.unitedcoders.android.gpodroid.R;
@@ -104,8 +106,8 @@ public class DownloadList extends ListActivity {
 
         setListAdapter(pcla);
 
-        final AlertDialog.Builder alert = new AlertDialog.Builder(this);
-        alert.setNeutralButton("let's pretend it's done", null);
+//        final AlertDialog.Builder alert = new AlertDialog.Builder(this);
+//        alert.setNeutralButton("let's pretend it's done", null);
         Button downloadButton = (Button) findViewById(R.id.downloadButton);
         final Intent intent = new Intent(this, DownloadService.class);
         downloadButton.setOnClickListener(new OnClickListener() {
@@ -113,13 +115,15 @@ public class DownloadList extends ListActivity {
             @Override
             public void onClick(View v) {
 
-                String download = pcla.getCheckedItems().get(0).getDownloadurl().toString();
+                String download = null;
 
+                List<PodcastElement> checkedItems = pcla.getCheckedItems();
+                for(PodcastElement pce : checkedItems){
+                    GpodRoid.addDownloadQueue(pce);
+                }
+                
                 intent.putExtra("podcast", download);
                 startService(intent);
-
-                // Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(download));
-                // startActivity(intent);
 
             }
         });
