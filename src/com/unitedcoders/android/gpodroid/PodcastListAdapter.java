@@ -4,15 +4,26 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Context;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.View.OnClickListener;
 import android.widget.BaseAdapter;
 
 public class PodcastListAdapter extends BaseAdapter {
+    
+    private boolean showCheckbox = false;
 
-	private Context context;
+	public boolean isShowCheckbox() {
+        return showCheckbox;
+    }
+
+
+    public void setShowCheckbox(boolean showCheckbox) {
+        this.showCheckbox = showCheckbox;
+    }
+
+
+
+    private Context context;
 	private List<PodcastElement> podcasts = new ArrayList<PodcastElement>();
 	
 	public PodcastListAdapter(Context context) {
@@ -43,7 +54,7 @@ public class PodcastListAdapter extends BaseAdapter {
 	public View getView(int position, View convertView, ViewGroup parent) {
 		PodcastView podcast;
 		if(convertView == null){
-			podcast = new PodcastView(context, podcasts.get(position));
+			podcast = new PodcastView(context, podcasts.get(position), showCheckbox);
 		} else {
 			podcast = (PodcastView) convertView;
 			

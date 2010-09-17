@@ -53,6 +53,7 @@ public class DownloadList extends ListActivity {
         setContentView(R.layout.downloadview);
 
         final PodcastListAdapter pcla = new PodcastListAdapter(this);
+        pcla.setShowCheckbox(true);
 
         GpodderUpdates podcast = null;
 

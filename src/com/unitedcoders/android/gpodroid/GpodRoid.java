@@ -23,6 +23,8 @@ import android.widget.TabHost;
 public class GpodRoid extends TabActivity {
 
     private static ArrayList<PodcastElement> downloadQueue = new ArrayList<PodcastElement>();
+    private static ArrayList<PodcastElement> playbackQueue = new ArrayList<PodcastElement>();
+    
 
     /**
      * 
@@ -44,6 +46,29 @@ public class GpodRoid extends TabActivity {
      */
     public static void addDownloadQueue(PodcastElement element) {
         downloadQueue.add(element);
+
+    }
+    
+    /**
+     * 
+     * @return next Element to download or null if empty
+     */
+    public static PodcastElement getNextPlayback() {
+
+        if (playbackQueue.size() > 0) {
+            PodcastElement element = downloadQueue.get(0);
+            playbackQueue.remove(0);
+            return element;
+        }
+        return null;
+    }
+
+    /**
+     * Add a PocastElement to the download queue
+     * @param element   PodcastElement to add
+     */
+    public static void addPlaybackQueue(PodcastElement element) {
+        playbackQueue.add(element);
 
     }
 
