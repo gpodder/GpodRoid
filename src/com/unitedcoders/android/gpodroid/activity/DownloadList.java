@@ -4,27 +4,16 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.text.Format;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-
-import org.apache.http.auth.UsernamePasswordCredentials;
-
-import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Credentials;
-import android.net.Uri;
 import android.os.Bundle;
-import android.text.format.DateFormat;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
-import android.widget.ListView;
 import android.widget.Toast;
 
 import com.unitedcoders.android.gpodroid.Base64;
@@ -32,10 +21,7 @@ import com.unitedcoders.android.gpodroid.GpodRoid;
 import com.unitedcoders.android.gpodroid.PodcastElement;
 import com.unitedcoders.android.gpodroid.PodcastListAdapter;
 import com.unitedcoders.android.gpodroid.R;
-import com.unitedcoders.android.gpodroid.R.id;
-import com.unitedcoders.android.gpodroid.R.layout;
 import com.unitedcoders.android.gpodroid.services.DownloadService;
-import com.unitedcoders.android.gpodroid.services.PlayerService;
 import com.unitedcoders.gpodder.GpodderAPI;
 import com.unitedcoders.gpodder.GpodderUpdates;
 

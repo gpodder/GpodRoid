@@ -22,11 +22,8 @@
 	<LinearLayout android:layout_width="fill_parent"
 		android:layout_height="wrap_content" android:orientation="horizontal"
 		android:layout_gravity="bottom|center">
-		<Button android:id="@+id/btn_cancel" android:layout_width="wrap_content"
-			android:layout_height="wrap_content" android:text="Cancel">
-		</Button>
-		<Button android:id="@+id/btn_save" android:layout_width="wrap_content"
-			android:layout_height="wrap_content" android:text="Save">
+		<Button android:id="@+id/btn_save" android:layout_width="fill_parent"
+			android:layout_height="wrap_content" android:text="Login">
 		</Button>
 	</LinearLayout>
 
