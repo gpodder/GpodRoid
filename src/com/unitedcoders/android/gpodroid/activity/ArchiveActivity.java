@@ -16,6 +16,7 @@ import org.jaudiotagger.tag.FieldKey;
 import org.jaudiotagger.tag.Tag;
 import org.jaudiotagger.tag.TagException;
 
+import com.unitedcoders.android.gpodroid.GpodRoid;
 import com.unitedcoders.android.gpodroid.PodcastElement;
 import com.unitedcoders.android.gpodroid.R;
 import com.unitedcoders.android.gpodroid.R.layout;
@@ -30,6 +31,7 @@ import android.os.Environment;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TabHost;
 
 public class ArchiveActivity extends ListActivity {
 
@@ -62,9 +64,9 @@ public class ArchiveActivity extends ListActivity {
         // podcasts.add("mygpodder.mp3");
         Iterator it = podcastArchive.iterator();
         ArrayList<String> albums = new ArrayList<String>();
-        while(it.hasNext()) {
-            String albs = ((PodcastElement)it.next()).getAlbum();
-            if (albs != null && albs.length() > 0 && ! albums.contains(albs)) {
+        while (it.hasNext()) {
+            String albs = ((PodcastElement) it.next()).getAlbum();
+            if (albs != null && albs.length() > 0 && !albums.contains(albs)) {
                 albums.add(albs);
             }
         }
@@ -79,31 +81,15 @@ public class ArchiveActivity extends ListActivity {
 
         super.onListItemClick(l, v, position, id);
 
-        String album =  (String) getListView().getItemAtPosition(position);
+        String album = (String) getListView().getItemAtPosition(position);
         Intent intent = new Intent(getApplicationContext(), ArchiveAlbums.class);
         intent.putExtra("album", album);
-        startActivity(intent);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         
-        //        try {
-//            // mp.setDataSource("/sdcard/gpodder/mypod.mp3");
-//            // mp.prepare();
-//            // mp.start();
-//            File file = new File("/sdcard/gpodder/" + (String) getListView().getItemAtPosition(position));
-//            // PodcastPlayerActivity.setPodcastAndPlay(file);
-//
-//            Intent intent = new Intent(ArchiveActivity.this, PlayerService.class);
-//            intent.putExtra("podcast", file.getPath());
-//
-//            startService(intent);
-//
-//        } catch (IllegalArgumentException e) {
-//            // TODO Auto-generated catch block
-//            e.printStackTrace();
-//        } catch (IllegalStateException e) {
-//            // TODO Auto-generated catch block
-//            e.printStackTrace();
-//        }
-
+        View view = ArchiveGroup.group.getLocalActivityManager().startActivity("ShowPodcasts", intent).getDecorView();
+        
+        ArchiveGroup.group.setContentView(view);
+        
     }
 
     private PodcastElement getPodcastInfo(File file) {
@@ -118,7 +104,6 @@ public class ArchiveActivity extends ListActivity {
             String title = tag.getFirst(FieldKey.TITLE);
             String download = "";
             String album = tag.getFirst(FieldKey.ALBUM);
-            
 
             pce = new PodcastElement(title, download);
             pce.setAlbum(album);
@@ -142,4 +127,7 @@ public class ArchiveActivity extends ListActivity {
 
     }
 
+    
+    
+    
 }

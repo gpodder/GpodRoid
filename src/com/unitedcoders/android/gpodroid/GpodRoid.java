@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import com.unitedcoders.android.gpodroid.activity.AccountSettings;
 import com.unitedcoders.android.gpodroid.activity.ArchiveActivity;
+import com.unitedcoders.android.gpodroid.activity.ArchiveGroup;
 import com.unitedcoders.android.gpodroid.activity.DownloadList;
 import com.unitedcoders.android.gpodroid.activity.DownloadProgress;
 import com.unitedcoders.android.gpodroid.activity.PlayerActivity;
@@ -84,7 +85,7 @@ public class GpodRoid extends TabActivity {
         tabHost.addTab(tabHost.newTabSpec("tab1").setIndicator("Player").setContent(
                 new Intent(this, PlayerActivity.class)));
         tabHost.addTab(tabHost.newTabSpec("tab2").setIndicator("Archive").setContent(
-                new Intent(this, ArchiveActivity.class)));
+                new Intent(this, ArchiveGroup.class)));
         tabHost.addTab(tabHost.newTabSpec("tab3").setIndicator("Updates").setContent(
                 new Intent(this, DownloadList.class)));
 

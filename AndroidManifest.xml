@@ -16,6 +16,7 @@
 		<activity android:name="com.unitedcoders.android.gpodroid.activity.PlayerActivity" />
 		<activity android:name="com.unitedcoders.android.gpodroid.activity.AccountSettings" />
 		<activity android:name="com.unitedcoders.android.gpodroid.activity.ArchiveAlbums" />
+		<activity android:name="com.unitedcoders.android.gpodroid.activity.ArchiveGroup" />
        
 
         <service android:name=".services.DownloadService" />
