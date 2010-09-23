@@ -16,9 +16,6 @@
 	</EditText>
 	<TextView android:layout_width="fill_parent"
         android:layout_height="wrap_content" android:text="Device" />
-    <EditText android:id="@+id/in_device" android:layout_width="fill_parent"
-        android:layout_height="wrap_content" android:text="EditText">
-    </EditText>
 	<LinearLayout android:layout_width="fill_parent"
 		android:layout_height="wrap_content" android:orientation="horizontal"
 		android:layout_gravity="bottom|center">

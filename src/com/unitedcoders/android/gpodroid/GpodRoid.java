@@ -21,11 +21,15 @@ import android.view.View;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.TabHost;
 
+/**
+ * Host of TabActivity and general info of state.
+ * @author Nico Heid
+ *
+ */
 public class GpodRoid extends TabActivity {
 
     private static ArrayList<PodcastElement> downloadQueue = new ArrayList<PodcastElement>();
     private static ArrayList<PodcastElement> playbackQueue = new ArrayList<PodcastElement>();
-    
 
     /**
      * 
@@ -43,13 +47,15 @@ public class GpodRoid extends TabActivity {
 
     /**
      * Add a PocastElement to the download queue
-     * @param element   PodcastElement to add
+     * 
+     * @param element
+     *            PodcastElement to add
      */
     public static void addDownloadQueue(PodcastElement element) {
         downloadQueue.add(element);
 
     }
-    
+
     /**
      * 
      * @return next Element to download or null if empty
@@ -66,7 +72,9 @@ public class GpodRoid extends TabActivity {
 
     /**
      * Add a PocastElement to the download queue
-     * @param element   PodcastElement to add
+     * 
+     * @param element
+     *            PodcastElement to add
      */
     public static void addPlaybackQueue(PodcastElement element) {
         playbackQueue.add(element);

@@ -11,6 +11,11 @@ import android.os.Bundle;
 import android.widget.ProgressBar;
 import android.widget.RemoteViews;
 
+/**
+ * Download of podcasts with ProgressBar
+ * @author Nico Heid
+ *
+ */
 public class DownloadProgress extends Activity {
 
     ProgressBar progressBar;

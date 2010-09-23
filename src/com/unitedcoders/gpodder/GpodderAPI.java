@@ -18,10 +18,18 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.unitedcoders.android.gpodroid.Base64;
+import com.unitedcoders.android.gpodroid.Preferences;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.preference.Preference;
+import android.widget.Toast;
 
+/**
+ * The calls against gpodder.net API
+ * @author Nico Heid
+ *
+ */
 public class GpodderAPI {
 
     public static final String PREFS_NAME = "gpodroidPrefs";
@@ -57,25 +65,61 @@ public class GpodderAPI {
 
     }
 
+    public static GpodderUpdates getDownloadList(Preferences pref){
+        
+        GpodderUpdates podcast = null;
+
+        // get preferences
+       
+        URL url;
+        // try to get the updates
+        try {
+            Long since = (new Date().getTime() / 1000) - 3600*24*14;
+            
+            String urlStr = "http://gpodder.net/api/2/updates/USERNAME/DEVICE.json?since="+since;
+            urlStr = urlStr.replace("USERNAME", pref.getUsername());
+            urlStr = urlStr.replace("DEVICE", pref.getDevice());
+            url = new URL(urlStr);
+            URLConnection conn = url.openConnection();
+            conn.setRequestProperty("Authorization", "Basic "
+                    + Base64.encodeBytes((pref.getUsername() + ":" + pref.getPassword()).getBytes()));
+            // + BasicAuth.encode(username, password));
+            GpodderAPI api = new GpodderAPI("", "");
+            podcast = api.parseResponse(conn.getInputStream());
+
+        } catch (MalformedURLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
+        return podcast;
+    
+    }
+    
+    
     public ArrayList<String> getDevices(Context context) {
 
         ObjectMapper mapper = new ObjectMapper();
 
-        SharedPreferences settings = context.getSharedPreferences(PREFS_NAME, 0);
-        this.username = settings.getString("username", "");
-        this.password = settings.getString("password", "");
+        Preferences pref = Preferences.getPreferences(context);
+        
 
         ArrayList<String> gpodderDevices = new ArrayList<String>();
 
         String urlStr = "http://gpodder.net/api/2/devices/USERNAME.json";
-        urlStr = urlStr.replace("USERNAME", username);
+        urlStr = urlStr.replace("USERNAME", pref.getUsername());
         URL url;
         try {
             url = new URL(urlStr);
 
             URLConnection conn = url.openConnection();
             conn.setRequestProperty("Authorization", "Basic "
-                    + Base64.encodeBytes((username + ":" + password).getBytes()));
+                    + Base64.encodeBytes((pref.getUsername() + ":" + pref.getPassword()).getBytes()));
 
             String response = IOUtils.toString(conn.getInputStream());
             JSONArray devices = new JSONArray(response);

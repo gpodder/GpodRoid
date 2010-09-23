@@ -7,6 +7,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
+/**
+ * Groups the archive activities, so they can stay within a tab of TabActivity
+ * @author Nico Heid
+ *
+ */
 public class ArchiveGroup extends ActivityGroup {
 
     public static ArchiveGroup group;

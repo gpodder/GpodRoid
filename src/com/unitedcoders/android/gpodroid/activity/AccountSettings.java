@@ -10,15 +10,13 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.unitedcoders.android.gpodroid.Preferences;
 import com.unitedcoders.android.gpodroid.R;
 import com.unitedcoders.android.gpodroid.R.layout;
 
 public class AccountSettings extends Activity {
 
-    public static final String PREFS_NAME = "gpodroidPrefs";
-    private String USERNAME = "username";
-    private String PASSWORD = "password";
-    private String DEVICE = "device";
+    Preferences pref;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,25 +24,28 @@ public class AccountSettings extends Activity {
         super.onCreate(savedInstanceState);
 
         setContentView(layout.accountsettings);
+        
+        pref = Preferences.getPreferences(getApplicationContext());
+        
+        EditText etUsername = (EditText) findViewById(R.id.in_username);
+        EditText etPassword = (EditText) findViewById(R.id.in_password);
+        etUsername.setText(pref.getUsername());
+        etPassword.setText(pref.getPassword());
+        
 
         Button save = (Button) findViewById(R.id.btn_save);
         save.setOnClickListener(new OnClickListener() {
 
             @Override
             public void onClick(View v) {
-                SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
-                SharedPreferences.Editor editor = settings.edit();
-
-                editor.putString(USERNAME, ((EditText) (findViewById(R.id.in_username))).getText().toString());
-                editor.putString(PASSWORD, ((EditText) (findViewById(R.id.in_password))).getText().toString());
-//                editor.putString(DEVICE, ((EditText) (findViewById(R.id.in_device))).getText().toString());
-
-                editor.commit();
-
-//                finish();
+                
+                pref.setUsername(((EditText) (findViewById(R.id.in_username))).getText().toString());
+                pref.setPassword(((EditText) (findViewById(R.id.in_password))).getText().toString());
+                pref.save();
                 
                 Intent intent = new Intent(getApplicationContext(), SelectDevice.class);
                 startActivity(intent);
+                finish();
             }
 
         });

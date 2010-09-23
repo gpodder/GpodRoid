@@ -30,7 +30,11 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.view.View.OnClickListener;
 
-// this shows the podcasts currently played and controls
+/**
+ * Shows the MediaPlayer and controls
+ * @author Nico Heid
+ *
+ */
 public class PlayerActivity extends Activity {
 
     private static File podcast;
