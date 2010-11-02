@@ -8,6 +8,7 @@ import com.unitedcoders.android.gpodroid.activity.ArchiveGroup;
 import com.unitedcoders.android.gpodroid.activity.DownloadList;
 import com.unitedcoders.android.gpodroid.activity.DownloadProgress;
 import com.unitedcoders.android.gpodroid.activity.PlayerActivity;
+import com.unitedcoders.android.gpodroid.activity.Subscribe;
 
 import android.app.Activity;
 import android.app.TabActivity;
@@ -23,8 +24,9 @@ import android.widget.TabHost;
 
 /**
  * Host of TabActivity and general info of state.
+ * 
  * @author Nico Heid
- *
+ * 
  */
 public class GpodRoid extends TabActivity {
 
@@ -123,9 +125,17 @@ public class GpodRoid extends TabActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // TODO Auto-generated method stub
-        Intent intent = new Intent(this, AccountSettings.class);
-        startActivity(intent);
-        return true;
+        switch (item.getItemId()) {
+        case R.id.account:
+            Intent intent = new Intent(this, AccountSettings.class);
+            startActivity(intent);
+            return true;
+        case R.id.subscriptions:
+            Intent intent2 = new Intent(this, Subscribe.class);
+            startActivity(intent2);
+            return true;
+        default:
+            return super.onOptionsItemSelected(item);
+        }
     }
 }
