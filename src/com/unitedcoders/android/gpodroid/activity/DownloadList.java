@@ -10,7 +10,6 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.unitedcoders.android.gpodroid.GpodRoid;
 import com.unitedcoders.android.gpodroid.PodcastElement;
 import com.unitedcoders.android.gpodroid.PodcastListAdapter;
 import com.unitedcoders.android.gpodroid.Preferences;
@@ -67,9 +66,9 @@ public class DownloadList extends ListActivity {
                 String download = null;
 
                 List<PodcastElement> checkedItems = pcla.getCheckedItems();
-                for (PodcastElement pce : checkedItems) {
-                    GpodRoid.addDownloadQueue(pce);
-                }
+//                for (PodcastElement pce : checkedItems) {
+//                    GpodRoid.addDownloadQueue(pce);
+//                }
 
                 intent.putExtra("podcast", download);
                 startService(intent);

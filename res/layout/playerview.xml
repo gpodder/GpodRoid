@@ -6,10 +6,10 @@
 	<TextView android:id="@+id/plain1" android:text="Now Playing"
 		android:layout_width="wrap_content" android:layout_height="wrap_content" />
 
-	<TextView android:id="@+id/plain2" android:text="Podcast Title"
+	<TextView android:id="@+id/PodcastTitle" android:text="Podcast Title"
 		android:layout_width="wrap_content" android:layout_height="wrap_content" />
 
-	<TextView android:id="@+id/plain3" android:text="Episode Name"
+	<TextView android:id="@+id/EpisodeName" android:text="Episode Name"
 		android:layout_width="wrap_content" android:layout_height="wrap_content" />
 
 
@@ -22,11 +22,16 @@
 		android:layout_height="wrap_content" android:orientation="horizontal">
 
 
-		<Button android:id="@+id/buttonPlay" android:layout_width="wrap_content"
+		<Button android:id="@+id/buttonPlay" android:layout_width="fill_parent"
 			android:layout_height="wrap_content" android:text="Pause" />
-		<Button android:id="@+id/buttonStop" android:layout_width="wrap_content"
-			android:layout_height="wrap_content" android:text="Stop" />
+	
 	</LinearLayout>
+	   
+	   
+	   <Button android:id="@+id/btn_podcasts" android:layout_width="fill_parent"
+            android:layout_height="wrap_content" android:text="Podcasts"
+            android:onClick="openPodcastManager" />
+	
 
 </LinearLayout>
 

@@ -6,12 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-
-import com.unitedcoders.android.gpodroid.GpodRoid;
-import com.unitedcoders.android.gpodroid.PodcastElement;
-import com.unitedcoders.android.gpodroid.R;
-import com.unitedcoders.android.gpodroid.activity.DownloadList;
-import com.unitedcoders.android.gpodroid.activity.DownloadProgress;
+import java.util.ArrayList;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -22,11 +17,16 @@ import android.os.Environment;
 import android.os.IBinder;
 import android.util.Log;
 import android.widget.RemoteViews;
-import android.widget.Toast;
+
+import com.unitedcoders.android.gpodroid.PodcastElement;
+import com.unitedcoders.android.gpodroid.R;
+import com.unitedcoders.android.gpodroid.activity.DownloadList;
 
 public class DownloadService extends Service {
     private int podDownloadedSize, podTotalSize;
     private Intent intent;
+    
+    public static ArrayList<PodcastElement> downloadQueue = new ArrayList<PodcastElement>();
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -56,9 +56,9 @@ public class DownloadService extends Service {
 
         public void run() {
             PodcastElement pce = null;
-            while ((pce = GpodRoid.getNextDownload()) != null) {
+            while (downloadQueue.size() > 0 && (pce = downloadQueue.get(0)) != null) {
                 try {
-
+                    Log.d("Gpodroid", "starting download "+pce.getDownloadurl());
                     URL podcastURL = new URL(pce.getDownloadurl());
                     HttpURLConnection urlConnection = (HttpURLConnection) podcastURL.openConnection();
                     urlConnection.setRequestMethod("GET");
@@ -67,7 +67,7 @@ public class DownloadService extends Service {
                     urlConnection.connect();
 
                     File SDCardRoot = Environment.getExternalStorageDirectory();
-                    new File("/sdcard/gpodder/").mkdir();
+                    new File(SDCardRoot+"/gpodder/").mkdir();
 
                     File name = new File(podcastURL.toString());
                     String saveName = name.getName().trim();
@@ -128,9 +128,12 @@ public class DownloadService extends Service {
 
                     notificationManager.cancel(42);
                     fileOutput.close();
+                    
                 } catch (IOException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
+                    Log.e("Gpodroid", "error when downloading "+pce.getDownloadurl(), e);
+                    
+                } finally{
+                    downloadQueue.remove(0);
                 }
 
                 // Toast.makeText(this, "download ended", Toast.LENGTH_LONG);

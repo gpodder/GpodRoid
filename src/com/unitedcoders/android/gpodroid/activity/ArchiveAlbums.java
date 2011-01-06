@@ -3,18 +3,17 @@ package com.unitedcoders.android.gpodroid.activity;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import com.unitedcoders.android.gpodroid.PodcastElement;
-import com.unitedcoders.android.gpodroid.PodcastListAdapter;
-import com.unitedcoders.android.gpodroid.R;
-import com.unitedcoders.android.gpodroid.services.PlayerService;
-
 import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
+
+import com.unitedcoders.android.gpodroid.PodcastElement;
+import com.unitedcoders.android.gpodroid.PodcastListAdapter;
+import com.unitedcoders.android.gpodroid.R;
+import com.unitedcoders.android.gpodroid.services.PlayerService;
 
 public class ArchiveAlbums extends ListActivity {
 
@@ -61,7 +60,8 @@ public class ArchiveAlbums extends ListActivity {
 
         PodcastElement pce = (PodcastElement) l.getItemAtPosition(position);
         Intent intent = new Intent(getApplicationContext(), PlayerService.class);
-        intent.putExtra("podcast", pce.getFile());
+//        intent.putExtra("podcast", pce.getFile());
+        //        GpodRoid.addPlaybackQueue(pce);
         startService(intent);
     }
 

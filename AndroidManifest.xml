@@ -3,26 +3,40 @@
 	package="com.unitedcoders.android.gpodroid" android:versionCode="1"
 	android:versionName="1.0">
 	<application android:icon="@drawable/icon" android:label="@string/app_name" android:debuggable="true" >
-		<activity android:name=".GpodRoid" android:label="@string/app_name">
+		<activity android:name=".activity.Player" android:label="@string/app_name">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />
 				<category android:name="android.intent.category.LAUNCHER" />
+				<action android:name="com.unitedcoders.android.gpodroid.PLAYPODCAST"/>
 			</intent-filter>
 		</activity>
 
 		<activity android:name="com.unitedcoders.android.gpodroid.activity.DownloadList" />
 		<activity android:name="com.unitedcoders.android.gpodroid.activity.DownloadProgress" />
 		<activity android:name="com.unitedcoders.android.gpodroid.activity.ArchiveActivity" />
-		<activity android:name="com.unitedcoders.android.gpodroid.activity.PlayerActivity" />
+		
+		<activity android:name="com.unitedcoders.android.gpodroid.activity.PlayerActivity">
+		  <intent-filter>
+		      <action android:name="com.unitedcoders.android.gpodroid.PLAYPODCAST"/>
+		  </intent-filter>
+		</activity>
+		
+		
 		<activity android:name="com.unitedcoders.android.gpodroid.activity.AccountSettings" />
 		<activity android:name="com.unitedcoders.android.gpodroid.activity.ArchiveAlbums" />
 		<activity android:name="com.unitedcoders.android.gpodroid.activity.ArchiveGroup" />
 		<activity android:name="com.unitedcoders.android.gpodroid.activity.SelectDevice" />
 		<activity android:name="com.unitedcoders.android.gpodroid.activity.Subscribe" />
+		<activity android:name="com.unitedcoders.android.gpodroid.activity.PodcastManager" />
        
 
         <service android:name=".services.DownloadService" />
-		<service android:name="com.unitedcoders.android.gpodroid.services.PlayerService" />
+		<service android:name="com.unitedcoders.android.gpodroid.services.PlayerService">
+		 <intent-filter>
+		  <action android:name="playerservice" android:value="com.unitedcoders.android.gpodroid.services.PLAYER_SERVICE"/>
+		 </intent-filter>
+		</service> 
+	
 		
 		
 		

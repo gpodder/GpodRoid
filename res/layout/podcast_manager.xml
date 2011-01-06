@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TabHost xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@android:id/tabhost" android:layout_width="fill_parent"
+	android:layout_height="fill_parent">
+
+	<LinearLayout android:orientation="vertical"
+		android:layout_width="fill_parent" android:layout_height="fill_parent">
+		<TabWidget android:id="@android:id/tabs"
+			android:layout_width="fill_parent" android:layout_height="wrap_content" />
+		<FrameLayout android:id="@android:id/tabcontent"
+			android:layout_width="fill_parent" android:layout_height="fill_parent">
+
+
+			<ViewFlipper android:id="@+id/tabmgr_sdcard"
+				android:layout_width="fill_parent" android:layout_height="fill_parent">
+
+				<ListView android:id="@+id/lv_albums" android:layout_width="fill_parent"
+					android:layout_height="fill_parent" />
+				<ListView android:id="@+id/lv_podcasts"
+					android:layout_width="fill_parent" android:layout_height="fill_parent" />
+				<!-- <TextView android:id="@+id/tabone1" android:layout_width="fill_parent" 
+					android:layout_height="fill_parent" android:text="@+string/tab1_content1" 
+					/> <TextView android:id="@+id/tabone2" android:layout_width="fill_parent" 
+					android:layout_height="fill_parent" android:text="@+string/tab1_content2" 
+					/> -->
+			</ViewFlipper>
+
+
+
+			<RelativeLayout android:id="@+id/tabmgr_newpodcasts"
+				android:layout_width="fill_parent"
+				android:layout_height="fill_parent">
+
+				<ListView android:id="@+id/lv_downloads"
+					android:layout_width="fill_parent" android:layout_height="fill_parent"
+					android:layout_above="@id/downloadButton" />
+
+				<Button android:id="@+id/downloadButton"
+					android:layout_width="fill_parent" android:layout_height="wrap_content"
+					android:text="Download" android:layout_alignParentBottom="true" />
+
+
+			</RelativeLayout>
+
+
+			<LinearLayout android:id="@+id/tabmgr_subscriptions"
+				android:orientation="vertical" android:layout_width="fill_parent"
+				android:layout_height="fill_parent">
+				<TextView android:id="@+id/textview2" android:layout_width="fill_parent"
+					android:layout_height="wrap_content" android:text="podcasts to subscribe to" />
+
+			</LinearLayout>
+
+
+
+		</FrameLayout>
+	</LinearLayout>
+
+
+</TabHost>

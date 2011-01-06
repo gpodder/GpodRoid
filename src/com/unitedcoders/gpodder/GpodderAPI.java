@@ -21,13 +21,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.content.Context;
+import android.util.Log;
+
 import com.unitedcoders.android.gpodroid.Base64;
 import com.unitedcoders.android.gpodroid.Preferences;
-
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.preference.Preference;
-import android.widget.Toast;
 
 /**
  * The calls against gpodder.net API
@@ -179,14 +177,11 @@ public class GpodderAPI {
                 }
             }
         } catch (MalformedURLException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            Log.e("Gpodroid", "error when getting devices "+e);
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            Log.e("Gpodroid", "error when getting devices "+e);
         } catch (JSONException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            Log.e("Gpodroid", "error when getting devices "+e);
         }
         return gpodderDevices;
 

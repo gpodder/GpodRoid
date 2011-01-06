@@ -30,6 +30,11 @@ public class PodcastListAdapter extends BaseAdapter {
 		this.context = context;
 	}
 	
+	public PodcastListAdapter(Context context, List<PodcastElement> podcasts) {
+        this.context = context;
+        this.podcasts = podcasts;
+    }
+	
 	
 	@Override
 	public int getCount() {
