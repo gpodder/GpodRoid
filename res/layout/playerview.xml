@@ -1,38 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	android:layout_width="fill_parent" android:layout_height="fill_parent"
-	android:orientation="vertical">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent" android:layout_height="fill_parent">
 
-	<TextView android:id="@+id/plain1" android:text="Now Playing"
-		android:layout_width="wrap_content" android:layout_height="wrap_content" />
+	<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+		android:orientation="vertical" android:layout_width="fill_parent"
+		android:layout_height="wrap_content" android:layout_centerInParent="true">
 
-	<TextView android:id="@+id/PodcastTitle" android:text="Podcast Title"
-		android:layout_width="wrap_content" android:layout_height="wrap_content" />
+		<TextView android:id="@+id/plain1" android:text="Now Playing:"
+			android:layout_width="wrap_content" android:layout_height="wrap_content"
+			android:layout_gravity="center" />
 
-	<TextView android:id="@+id/EpisodeName" android:text="Episode Name"
-		android:layout_width="wrap_content" android:layout_height="wrap_content" />
+		<TextView android:id="@+id/PodcastTitle" android:text="Podcast Title"
+			android:layout_width="wrap_content" android:layout_height="wrap_content"
+			android:textSize="18dip" android:layout_gravity="center" />
+
+		<TextView android:id="@+id/EpisodeName" android:text="Episode Name"
+			android:layout_width="wrap_content" android:layout_height="wrap_content"
+			android:layout_gravity="center" android:textSize="20dip" />
+		<TextView android:id="@+id/space" android:text=""
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:layout_gravity="center" />
 
 
 
-	<ImageView android:id="@+id/podcastPicture"
-		android:layout_width="fill_parent" android:layout_height="wrap_content"
-		android:background="#660066" />
-
-	<LinearLayout android:layout_width="fill_parent"
-		android:layout_height="wrap_content" android:orientation="horizontal">
-
+		<ImageView android:id="@+id/podcastPicture"
+			android:layout_width="fill_parent" android:layout_height="wrap_content"
+			android:background="#660066" />
 
 		<Button android:id="@+id/buttonPlay" android:layout_width="fill_parent"
 			android:layout_height="wrap_content" android:text="Pause" />
-	
 	</LinearLayout>
-	   
-	   
-	   <Button android:id="@+id/btn_podcasts" android:layout_width="fill_parent"
-            android:layout_height="wrap_content" android:text="Podcasts"
-            android:onClick="openPodcastManager" />
-	
 
-</LinearLayout>
+
+
+	<Button android:id="@+id/btn_podcasts" android:layout_width="fill_parent"
+		android:layout_height="wrap_content" android:text="Podcasts"
+		android:onClick="openPodcastManager" android:layout_alignParentBottom="true" />
+
+
+</RelativeLayout>
 
 
