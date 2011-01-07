@@ -126,10 +126,10 @@ public class PodcastManager extends TabActivity implements OnClickListener {
 
     private void showPodcast(String album) {
 
-        Toast.makeText(getApplicationContext(), "showing " + album, Toast.LENGTH_SHORT).show();
+//        Toast.makeText(getApplicationContext(), "showing " + album, Toast.LENGTH_SHORT).show();
 
         PodcastListAdapter pcla = new PodcastListAdapter(getApplicationContext());
-        ArrayList<PodcastElement> podcastNames = new ArrayList<PodcastElement>();
+        ArrayList<PodcastElement> podcastElements = new ArrayList<PodcastElement>();
 
         try {
             Iterator it = podcastArchive.iterator();
@@ -138,13 +138,13 @@ public class PodcastManager extends TabActivity implements OnClickListener {
                 if (pce != null && pce.getAlbum() != null && pce.getAlbum().equals(album) && pce.getTitle() != null
                         && pce.getTitle().length() > 0) {
                     // podcastArchive.add(pce);
-                    podcastNames.add(pce);
+                    podcastElements.add(pce);
                 }
             }
 
             // ArrayAdapter adapter = new ArrayAdapter(getApplicationContext(), android.R.layout.simple_list_item_1,
             // podcastNames);
-            PodcastListAdapter adapter = new PodcastListAdapter(getApplicationContext(), podcastNames);
+            PodcastListAdapter adapter = new PodcastListAdapter(getApplicationContext(), podcastElements);
             lvPodcasts.setAdapter(adapter);
             lvPodcasts.setOnItemClickListener(new OnItemClickListener() {
 

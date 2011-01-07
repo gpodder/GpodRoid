@@ -17,7 +17,7 @@
 				<ListView android:id="@+id/lv_albums" android:layout_width="fill_parent"
 					android:layout_height="fill_parent" />
 				<ListView android:id="@+id/lv_podcasts"
-					android:layout_width="fill_parent" android:layout_height="fill_parent" />
+					android:layout_width="fill_parent" android:layout_height="wrap_content" />
 				<!-- <TextView android:id="@+id/tabone1" android:layout_width="fill_parent" 
 					android:layout_height="fill_parent" android:text="@+string/tab1_content1" 
 					/> <TextView android:id="@+id/tabone2" android:layout_width="fill_parent" 
