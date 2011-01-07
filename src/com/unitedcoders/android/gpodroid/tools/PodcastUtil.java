@@ -3,6 +3,9 @@ package com.unitedcoders.android.gpodroid.tools;
 import java.io.File;
 import java.io.IOException;
 
+import org.cmc.music.metadata.MusicMetadata;
+import org.cmc.music.metadata.MusicMetadataSet;
+import org.cmc.music.myid3.MyID3;
 import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
 import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
 import org.jaudiotagger.audio.mp3.MP3File;
@@ -23,6 +26,20 @@ public class PodcastUtil {
         // fill podcastinfo
         PodcastElement pce = new PodcastElement("", "");
         MP3File mp3 = null;
+
+        try {
+            MusicMetadataSet id3set = new MyID3().read(file);
+            MusicMetadata meta = (MusicMetadata) id3set.getSimplified();
+            pce.setAlbum(meta.getAlbum());
+            pce.setTitle(meta.getSongTitle());
+            pce.setFile(file.getAbsolutePath());
+            return pce;
+            
+        } catch (IOException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
+        
         try {
             mp3 = new MP3File(file);
 

@@ -8,6 +8,8 @@ import java.util.List;
 import android.app.TabActivity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
@@ -19,6 +21,7 @@ import android.widget.TabHost;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
 
+import com.unitedcoders.android.gpodroid.GpodRoid;
 import com.unitedcoders.android.gpodroid.PodcastElement;
 import com.unitedcoders.android.gpodroid.PodcastListAdapter;
 import com.unitedcoders.android.gpodroid.Preferences;
@@ -40,6 +43,10 @@ public class PodcastManager extends TabActivity implements OnClickListener {
 
     private ArrayAdapter adapter;
     private ViewFlipper sdcardFlipper;
+
+    private Handler handler = new Handler();
+    private PodcastListAdapter pcla;
+    private Preferences pref; 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -159,42 +166,33 @@ public class PodcastManager extends TabActivity implements OnClickListener {
     }
 
     private void showDownloads() {
-        final PodcastListAdapter pcla = new PodcastListAdapter(this);
-        pcla.setShowCheckbox(true);
+        
 
         // get preferences
-        Preferences pref = Preferences.getPreferences(getApplicationContext());
+        pref = Preferences.getPreferences(getApplicationContext());
+
         if (pref.getUsername().equals("") || pref.getPassword().equals("") || pref.getDevice().equals("")) {
 
             Toast toast = Toast.makeText(getApplicationContext(), "please enter your settings first",
                     Toast.LENGTH_SHORT);
             toast.show();
-            
+
             startActivity(new Intent(getApplicationContext(), AccountSettings.class));
 
             return;
 
         }
 
-        GpodderUpdates podcast = GpodderAPI.getDownloadList(pref);
-
-        // add items to download list
-        for (int i = 0; i < podcast.getUpdates().size(); i++) {
-            pcla.addItem(new PodcastElement(podcast.getUpdates().get(i).getTitle(), podcast.getUpdates().get(i)
-                    .getUrl()));
-        }
-
-        // setListAdapter(pcla);
-        lvDownloads.setAdapter(pcla);
-
+        pcla = new PodcastListAdapter(this);
+        pcla.setShowCheckbox(true);
+        downloadProcessing();
+        
         Button downloadButton = (Button) findViewById(R.id.downloadButton);
         final Intent intent = new Intent(this, DownloadService.class);
         downloadButton.setOnClickListener(new OnClickListener() {
 
             @Override
             public void onClick(View v) {
-
-                String download = null;
 
                 List<PodcastElement> checkedItems = pcla.getCheckedItems();
                 for (PodcastElement pce : checkedItems) {
@@ -205,6 +203,41 @@ public class PodcastManager extends TabActivity implements OnClickListener {
 
             }
         });
+    }
+
+    private void downloadProcessing() {
+        Thread thread = new Thread(null, doGetPodcastDownloadInfo, "Background");
+        thread.start();
+    }
+
+    private Runnable doUpdateDownloadList = new Runnable() {
+        public void run() {
+            lvDownloads.setAdapter(pcla);
+
+        }
+    };
+
+    private Runnable doGetPodcastDownloadInfo = new Runnable() {
+        public void run() {
+            backgroundPodcastInfoFetcher();
+        }
+    };
+
+    private void backgroundPodcastInfoFetcher() {
+        GpodderUpdates podcast = GpodderAPI.getDownloadList(pref);
+        
+        if(podcast == null){
+            Log.e(GpodRoid.LOGTAG, "cant display downloads, got empty result");
+            return;
+        }
+
+        // add items to download list
+        for (int i = 0; i < podcast.getUpdates().size(); i++) {
+            pcla.addItem(new PodcastElement(podcast.getUpdates().get(i).getTitle(), podcast.getUpdates().get(i)
+                    .getUrl()));
+        }
+
+        handler.post(doUpdateDownloadList);
     }
 
 }

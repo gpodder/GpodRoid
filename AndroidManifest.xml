@@ -11,36 +11,14 @@
 			</intent-filter>
 		</activity>
 
-		<activity android:name="com.unitedcoders.android.gpodroid.activity.DownloadList" />
-		<activity android:name="com.unitedcoders.android.gpodroid.activity.DownloadProgress" />
-		<activity android:name="com.unitedcoders.android.gpodroid.activity.ArchiveActivity" />
-		
-		<activity android:name="com.unitedcoders.android.gpodroid.activity.PlayerActivity">
-		  <intent-filter>
-		      <action android:name="com.unitedcoders.android.gpodroid.PLAYPODCAST"/>
-		  </intent-filter>
-		</activity>
-		
-		
-		<activity android:name="com.unitedcoders.android.gpodroid.activity.AccountSettings" />
-		<activity android:name="com.unitedcoders.android.gpodroid.activity.ArchiveAlbums" />
-		<activity android:name="com.unitedcoders.android.gpodroid.activity.ArchiveGroup" />
-		<activity android:name="com.unitedcoders.android.gpodroid.activity.SelectDevice" />
-		<activity android:name="com.unitedcoders.android.gpodroid.activity.Subscribe" />
-		<activity android:name="com.unitedcoders.android.gpodroid.activity.PodcastManager" />
-       
+		<activity android:name=".activity.DownloadProgress" />
+		<activity android:name=".activity.AccountSettings" />
+        <activity android:name=".activity.SelectDevice" />
+        <activity android:name=".activity.PodcastManager" />
+		<activity android:name=".activity.PlayerActivity" />
 
         <service android:name=".services.DownloadService" />
-		<service android:name="com.unitedcoders.android.gpodroid.services.PlayerService">
-		 <intent-filter>
-		  <action android:name="playerservice" android:value="com.unitedcoders.android.gpodroid.services.PLAYER_SERVICE"/>
-		 </intent-filter>
-		</service> 
 	
-		
-		
-		
-
 	</application>
 	
 	<uses-permission android:name="android.permission.INTERNET"></uses-permission>

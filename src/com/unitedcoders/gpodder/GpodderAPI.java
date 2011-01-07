@@ -25,6 +25,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.unitedcoders.android.gpodroid.Base64;
+import com.unitedcoders.android.gpodroid.GpodRoid;
 import com.unitedcoders.android.gpodroid.Preferences;
 
 /**
@@ -41,6 +42,8 @@ public class GpodderAPI {
     private URL urlGetNewPodcasts;
     private String username;
     private String password;
+    
+    static GpodderUpdates downloadListResponse = null;
 
     public GpodderAPI(String user, String password) {
         this.username = user;
@@ -54,14 +57,11 @@ public class GpodderAPI {
         try {
             pc = mapper.readValue(inputStream, GpodderUpdates.class);
         } catch (JsonParseException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            Log.e(GpodRoid.LOGTAG, "error while parsing", e);
         } catch (JsonMappingException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            Log.e(GpodRoid.LOGTAG, "error while parsing", e);
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            Log.e(GpodRoid.LOGTAG, "error while parsing", e);
         }
 
         return pc;
@@ -70,8 +70,10 @@ public class GpodderAPI {
 
     public static GpodderUpdates getDownloadList(Preferences pref) {
 
-        GpodderUpdates podcast = null;
-
+        if(downloadListResponse != null){
+            return downloadListResponse;
+        }
+        
         // get preferences
 
         URL url;
@@ -84,23 +86,23 @@ public class GpodderAPI {
             urlStr = urlStr.replace("DEVICE", pref.getDevice());
             url = new URL(urlStr);
             URLConnection conn = url.openConnection();
-            conn.setRequestProperty("Authorization", "Basic "
-                    + Base64.encodeBytes((pref.getUsername() + ":" + pref.getPassword()).getBytes()));
+            conn.setRequestProperty("Authorization",
+                    "Basic " + Base64.encodeBytes((pref.getUsername() + ":" + pref.getPassword()).getBytes()));
             // + BasicAuth.encode(username, password));
             GpodderAPI api = new GpodderAPI("", "");
-            podcast = api.parseResponse(conn.getInputStream());
+            InputStream is = conn.getInputStream();
+            downloadListResponse = api.parseResponse(is);
+            is.close();
 
         } catch (MalformedURLException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            Log.e(GpodRoid.LOGTAG, "getDownloadList", e);
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            Log.e(GpodRoid.LOGTAG, "getDownloadList", e);
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e(GpodRoid.LOGTAG, "getDownloadList", e);
         }
 
-        return podcast;
+        return downloadListResponse;
 
     }
 
@@ -114,8 +116,8 @@ public class GpodderAPI {
             URLConnection con = new URL(urlStr).openConnection();
             con.setDoOutput(true);
             Preferences pref = Preferences.getPreferences(context);
-            con.setRequestProperty("Authorization", "Basic "
-                    + Base64.encodeBytes((pref.getUsername() + ":" + pref.getPassword()).getBytes()));
+            con.setRequestProperty("Authorization",
+                    "Basic " + Base64.encodeBytes((pref.getUsername() + ":" + pref.getPassword()).getBytes()));
 
             OutputStreamWriter out = new OutputStreamWriter(con.getOutputStream());
             out.write(device.toString());
@@ -142,7 +144,7 @@ public class GpodderAPI {
 
     public ArrayList<String> getDevices(Context context) {
 
-//        ObjectMapper mapper = new ObjectMapper();
+        // ObjectMapper mapper = new ObjectMapper();
 
         Preferences pref = Preferences.getPreferences(context);
 
@@ -155,8 +157,8 @@ public class GpodderAPI {
             url = new URL(urlStr);
 
             URLConnection conn = url.openConnection();
-            conn.setRequestProperty("Authorization", "Basic "
-                    + Base64.encodeBytes((pref.getUsername() + ":" + pref.getPassword()).getBytes()));
+            conn.setRequestProperty("Authorization",
+                    "Basic " + Base64.encodeBytes((pref.getUsername() + ":" + pref.getPassword()).getBytes()));
 
             String response = IOUtils.toString(conn.getInputStream());
             JSONArray devices = new JSONArray(response);
@@ -177,11 +179,11 @@ public class GpodderAPI {
                 }
             }
         } catch (MalformedURLException e) {
-            Log.e("Gpodroid", "error when getting devices "+e);
+            Log.e("Gpodroid", "error when getting devices " + e);
         } catch (IOException e) {
-            Log.e("Gpodroid", "error when getting devices "+e);
+            Log.e("Gpodroid", "error when getting devices " + e);
         } catch (JSONException e) {
-            Log.e("Gpodroid", "error when getting devices "+e);
+            Log.e("Gpodroid", "error when getting devices " + e);
         }
         return gpodderDevices;
 
@@ -193,7 +195,7 @@ public class GpodderAPI {
         Preferences pref = Preferences.getPreferences(context);
 
         HashMap<String, String> subscriptions = new HashMap<String, String>();
-//        ArrayList<String> gpodderDevices = new ArrayList<String>();
+        // ArrayList<String> gpodderDevices = new ArrayList<String>();
 
         String urlStr = "http://gpodder.net/toplist/25.json";
         urlStr = urlStr.replace("USERNAME", pref.getUsername());
@@ -202,8 +204,8 @@ public class GpodderAPI {
             url = new URL(urlStr);
 
             URLConnection conn = url.openConnection();
-            conn.setRequestProperty("Authorization", "Basic "
-                    + Base64.encodeBytes((pref.getUsername() + ":" + pref.getPassword()).getBytes()));
+            conn.setRequestProperty("Authorization",
+                    "Basic " + Base64.encodeBytes((pref.getUsername() + ":" + pref.getPassword()).getBytes()));
 
             String response = IOUtils.toString(conn.getInputStream());
             JSONArray top25 = new JSONArray(response);
@@ -226,12 +228,11 @@ public class GpodderAPI {
 
         return subscriptions;
     }
-    
-    public void addSubcription(Context context, String url){
+
+    public void addSubcription(Context context, String url) {
         String urlStr = "http://gpodder.net/api/1/subscriptions/USERNAME/DEVICE.json";
         JSONObject device = new JSONObject();
         JSONArray urls = new JSONArray();
-       
 
         try {
             urls.put(url);
@@ -241,9 +242,9 @@ public class GpodderAPI {
             urlStr = urlStr.replace("DEVICE", pref.getDevice());
             URLConnection con = new URL(urlStr).openConnection();
             con.setDoOutput(true);
-            
-            con.setRequestProperty("Authorization", "Basic "
-                    + Base64.encodeBytes((pref.getUsername() + ":" + pref.getPassword()).getBytes()));
+
+            con.setRequestProperty("Authorization",
+                    "Basic " + Base64.encodeBytes((pref.getUsername() + ":" + pref.getPassword()).getBytes()));
 
             OutputStreamWriter out = new OutputStreamWriter(con.getOutputStream());
             out.write(device.toString());
