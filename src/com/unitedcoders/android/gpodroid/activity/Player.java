@@ -1,13 +1,7 @@
 package com.unitedcoders.android.gpodroid.activity;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-
-import org.jaudiotagger.audio.exceptions.CannotReadException;
-import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
-import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
-import org.jaudiotagger.tag.TagException;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -20,7 +14,6 @@ import android.widget.TextView;
 
 import com.unitedcoders.android.gpodroid.PodcastElement;
 import com.unitedcoders.android.gpodroid.R;
-import com.unitedcoders.android.gpodroid.services.PlayerService;
 
 /**
  * Shows the MediaPlayer and controls
