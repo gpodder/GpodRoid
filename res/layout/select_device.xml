@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/devicelist" android:layout_width="fill_parent"
+	android:layout_height="fill_parent">
+
+	<ListView android:id="@android:id/list" android:layout_width="fill_parent"
+		android:layout_height="fill_parent" android:layout_above="@id/downloadButton" />
+
+	<Button android:id="@+id/btn_customname" android:layout_width="fill_parent"
+		android:layout_height="wrap_content" android:text="create custom device"
+		android:layout_alignParentBottom="true" />
+
+
+</RelativeLayout>
+

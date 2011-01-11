@@ -10,6 +10,7 @@ package com.unitedcoders.android.gpodroid;
 public class GpodRoid {
     
     public static String LOGTAG = "GpodRoid";
+    public static Preferences prefs;
     
     
 }

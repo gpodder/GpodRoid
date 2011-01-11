@@ -12,7 +12,9 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.unitedcoders.android.gpodroid.GpodRoid;
 import com.unitedcoders.android.gpodroid.PodcastElement;
+import com.unitedcoders.android.gpodroid.Preferences;
 import com.unitedcoders.android.gpodroid.R;
 
 /**
@@ -37,6 +39,9 @@ public class Player extends Activity {
         // TODO Auto-generated method stub
         super.onCreate(savedInstanceState);
         setContentView(R.layout.playerview);
+        
+        // load preferences
+        GpodRoid.prefs = Preferences.getPreferences(getApplicationContext());
 
         // Drawable d = GPodderActions
         // .LoadImageFromWebOperations("http://www.sysadminslife.com/wp-content/uploads/2009/07/tux.png");

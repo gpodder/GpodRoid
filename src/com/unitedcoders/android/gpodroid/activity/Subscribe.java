@@ -27,7 +27,7 @@ public class Subscribe extends ListActivity {
         // TODO Auto-generated method stub
         super.onCreate(savedInstanceState);
 
-        top25hm = new GpodderAPI("", "").getTopSubscriptions(getApplicationContext());
+        top25hm = new GpodderAPI().getTopSubscriptions(getApplicationContext());
         top25 = new ArrayList<String>(top25hm.keySet());
         this.setListAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, top25));
         registerForContextMenu(getListView());
@@ -41,7 +41,7 @@ public class Subscribe extends ListActivity {
         AdapterView.AdapterContextMenuInfo info = (AdapterContextMenuInfo) menuInfo;
         String itemAtPosition = (String) getListView().getItemAtPosition(info.position);
         Log.d("GPR", "subscribing to " + top25hm.get(itemAtPosition));
-        new GpodderAPI("", "").addSubcription(getApplicationContext(), top25hm.get(itemAtPosition));
+        new GpodderAPI().addSubcription(getApplicationContext(), top25hm.get(itemAtPosition));
         menu.add("subscribe");
 
     }

@@ -11,11 +11,11 @@ import android.widget.EditText;
  */
 public class Preferences {
 
-    private static Preferences preferences;
+//    private static GpodRoid.prefs preferences;
 
     private Context context;
     public static void setPreferences(Preferences preferences) {
-        Preferences.preferences = preferences;
+        GpodRoid.prefs = preferences;
     }
 
     public static final String PREFS_NAME = "gpodroidPrefs";
@@ -72,16 +72,16 @@ public class Preferences {
     }
 
     public static Preferences getPreferences(Context context) {
-        if (preferences == null) {
-            preferences = new Preferences();
+        if (GpodRoid.prefs == null) {
+            GpodRoid.prefs = new Preferences();
         }
         
-        preferences.setContext(context);
+        GpodRoid.prefs.setContext(context);
         SharedPreferences settings = context.getSharedPreferences(PREFS_NAME, 0);
-        preferences.setUsername(settings.getString("USERNAME", ""));
-        preferences.setPassword(settings.getString("PASSWORD", ""));
-        preferences.setDevice(settings.getString("DEVICE", ""));
-        return preferences;
+        GpodRoid.prefs.setUsername(settings.getString("USERNAME", ""));
+        GpodRoid.prefs.setPassword(settings.getString("PASSWORD", ""));
+        GpodRoid.prefs.setDevice(settings.getString("DEVICE", ""));
+        return GpodRoid.prefs;
     }
 
 }

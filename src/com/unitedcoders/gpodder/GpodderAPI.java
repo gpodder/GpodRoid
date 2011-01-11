@@ -40,14 +40,10 @@ public class GpodderAPI {
 
     private HttpURLConnection connection;
     private URL urlGetNewPodcasts;
-    private String username;
-    private String password;
-    
+
     static GpodderUpdates downloadListResponse = null;
 
-    public GpodderAPI(String user, String password) {
-        this.username = user;
-        this.password = password;
+    public GpodderAPI() {
     }
 
     public GpodderUpdates parseResponse(InputStream inputStream) {
@@ -68,12 +64,12 @@ public class GpodderAPI {
 
     }
 
-    public static GpodderUpdates getDownloadList(Preferences pref) {
+    public static GpodderUpdates getDownloadList() {
 
-        if(downloadListResponse != null){
+        if (downloadListResponse != null) {
             return downloadListResponse;
         }
-        
+
         // get preferences
 
         URL url;
@@ -82,14 +78,17 @@ public class GpodderAPI {
             Long since = (new Date().getTime() / 1000) - 3600 * 24 * 14;
 
             String urlStr = "http://gpodder.net/api/2/updates/USERNAME/DEVICE.json?since=" + since;
-            urlStr = urlStr.replace("USERNAME", pref.getUsername());
-            urlStr = urlStr.replace("DEVICE", pref.getDevice());
+            urlStr = urlStr.replace("USERNAME", GpodRoid.prefs.getUsername());
+            urlStr = urlStr.replace("DEVICE", GpodRoid.prefs.getDevice());
             url = new URL(urlStr);
             URLConnection conn = url.openConnection();
-            conn.setRequestProperty("Authorization",
-                    "Basic " + Base64.encodeBytes((pref.getUsername() + ":" + pref.getPassword()).getBytes()));
+            conn.setRequestProperty(
+                    "Authorization",
+                    "Basic "
+                            + Base64.encodeBytes((GpodRoid.prefs.getUsername() + ":" + GpodRoid.prefs.getPassword())
+                                    .getBytes()));
             // + BasicAuth.encode(username, password));
-            GpodderAPI api = new GpodderAPI("", "");
+            GpodderAPI api = new GpodderAPI();
             InputStream is = conn.getInputStream();
             downloadListResponse = api.parseResponse(is);
             is.close();
@@ -106,13 +105,15 @@ public class GpodderAPI {
 
     }
 
-    public void createDevice(Context context) throws JSONException {
-        String urlStr = String.format("http://gpodder.net/api/2/devices/%s/gpodroid.json", username);
+    public static void createDevice(Context context, String deviceName) {
+        String urlStr = String
+                .format("http://gpodder.net/api/2/devices/%s/gpodroid.json", GpodRoid.prefs.getUsername());
         JSONObject device = new JSONObject();
-        device.put("caption", "gpodroid");
-        device.put("type", "mobile");
 
         try {
+            device.put("caption", deviceName);
+            device.put("id", deviceName);
+            device.put("type", "mobile");
             URLConnection con = new URL(urlStr).openConnection();
             con.setDoOutput(true);
             Preferences pref = Preferences.getPreferences(context);
@@ -133,11 +134,11 @@ public class GpodderAPI {
             in.close();
 
         } catch (MalformedURLException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            Log.e(GpodRoid.LOGTAG, "error creating device", e);
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            Log.e(GpodRoid.LOGTAG, "error creating device", e);
+        } catch (JSONException e) {
+            Log.e(GpodRoid.LOGTAG, "error creating device", e);
         }
 
     }
@@ -169,15 +170,6 @@ public class GpodderAPI {
 
             }
 
-            if (!gpodderDevices.contains("gpodroid")) {
-                try {
-                    createDevice(context);
-                    return getDevices(context);
-                } catch (JSONException e1) {
-                    // TODO Auto-generated catch block
-                    e1.printStackTrace();
-                }
-            }
         } catch (MalformedURLException e) {
             Log.e("Gpodroid", "error when getting devices " + e);
         } catch (IOException e) {

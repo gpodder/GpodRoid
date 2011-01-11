@@ -10,6 +10,7 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.unitedcoders.android.gpodroid.GpodRoid;
 import com.unitedcoders.android.gpodroid.PodcastElement;
 import com.unitedcoders.android.gpodroid.PodcastListAdapter;
 import com.unitedcoders.android.gpodroid.Preferences;
@@ -35,7 +36,7 @@ public class DownloadList extends ListActivity {
         pcla.setShowCheckbox(true);
 
         // get preferences
-        Preferences pref = Preferences.getPreferences(getApplicationContext());
+        Preferences pref = GpodRoid.prefs;
         if (pref.getUsername().equals("") || pref.getPassword().equals("") || pref.getDevice().equals("")) {
 
             Toast toast = Toast.makeText(getApplicationContext(), "please enter your settings first",
@@ -46,7 +47,7 @@ public class DownloadList extends ListActivity {
 
         }
 
-        GpodderUpdates podcast = GpodderAPI.getDownloadList(pref);
+        GpodderUpdates podcast = GpodderAPI.getDownloadList();
 
         // add items to download list
         for (int i = 0; i < podcast.getUpdates().size(); i++) {

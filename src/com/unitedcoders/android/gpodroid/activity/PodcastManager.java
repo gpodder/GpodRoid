@@ -224,7 +224,7 @@ public class PodcastManager extends TabActivity implements OnClickListener {
     };
 
     private void backgroundPodcastInfoFetcher() {
-        GpodderUpdates podcast = GpodderAPI.getDownloadList(pref);
+        GpodderUpdates podcast = GpodderAPI.getDownloadList();
         
         if(podcast == null){
             Log.e(GpodRoid.LOGTAG, "cant display downloads, got empty result");
