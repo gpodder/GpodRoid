@@ -5,7 +5,7 @@
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
 	<classpathentry kind="lib" path="jars/commons-io-1.4.jar"/>
 	<classpathentry kind="lib" path="jars/MyID3_for_Android.jar"/>
-	<classpathentry kind="lib" path="C:/Users/nheid/workspace/GpodRoid/jars/jackson-core-asl-1.4.3.jar"/>
-	<classpathentry kind="lib" path="C:/Users/nheid/workspace/GpodRoid/jars/jackson-mapper-asl-1.4.3.jar"/>
+	<classpathentry kind="lib" path="jars/jackson-core-asl-1.4.3.jar"/>
+	<classpathentry kind="lib" path="jars/jackson-mapper-asl-1.4.3.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

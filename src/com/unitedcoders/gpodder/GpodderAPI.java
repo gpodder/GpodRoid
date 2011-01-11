@@ -107,7 +107,7 @@ public class GpodderAPI {
     }
 
     public void createDevice(Context context) throws JSONException {
-        String urlStr = "http://gpodder.net/api/2/devices/nheid/gpodroid.json";
+        String urlStr = String.format("http://gpodder.net/api/2/devices/%s/gpodroid.json", username);
         JSONObject device = new JSONObject();
         device.put("caption", "gpodroid");
         device.put("type", "mobile");
