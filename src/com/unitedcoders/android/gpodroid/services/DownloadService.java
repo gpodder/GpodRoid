@@ -21,6 +21,7 @@ import android.widget.RemoteViews;
 import com.unitedcoders.android.gpodroid.PodcastElement;
 import com.unitedcoders.android.gpodroid.R;
 import com.unitedcoders.android.gpodroid.activity.DownloadList;
+import com.unitedcoders.android.gpodroid.activity.PodcastManager;
 
 public class DownloadService extends Service {
     private int podDownloadedSize, podTotalSize;
@@ -134,6 +135,7 @@ public class DownloadService extends Service {
                     
                 } finally{
                     downloadQueue.remove(0);
+                    PodcastManager.podcastAdapter.notifyDataSetChanged();
                 }
 
                 // Toast.makeText(this, "download ended", Toast.LENGTH_LONG);

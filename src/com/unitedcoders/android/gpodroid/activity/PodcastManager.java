@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
@@ -41,12 +42,16 @@ public class PodcastManager extends TabActivity implements OnClickListener {
     private ListView lvPodcasts;
     private ListView lvDownloads;
 
+    public static PodcastListAdapter podcastAdapter;
+
     private ArrayAdapter adapter;
     private ViewFlipper sdcardFlipper;
 
     private Handler handler = new Handler();
     private PodcastListAdapter pcla;
-    private Preferences pref; 
+    private Preferences pref;
+
+    private boolean podcastSubmenu = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,7 +90,24 @@ public class PodcastManager extends TabActivity implements OnClickListener {
 
     }
 
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+
+        // if we're in the podcast view bring us back to archive view
+        // so it feels like regular behavior
+        if ((keyCode == KeyEvent.KEYCODE_BACK)) {
+            if (podcastSubmenu) {
+                sdcardFlipper.showNext();
+                podcastSubmenu = !podcastSubmenu;
+            } else {
+                return super.onKeyDown(keyCode, event);
+            }
+        }
+        return true;
+    }
+
     private void showArchive() {
+        podcastSubmenu = false;
         File podcastDir = new File("/sdcard/gpodder");
         String[] children = podcastDir.list();
         if (children == null) {
@@ -125,8 +147,9 @@ public class PodcastManager extends TabActivity implements OnClickListener {
     }
 
     private void showPodcast(String album) {
+        podcastSubmenu = true;
 
-//        Toast.makeText(getApplicationContext(), "showing " + album, Toast.LENGTH_SHORT).show();
+        // Toast.makeText(getApplicationContext(), "showing " + album, Toast.LENGTH_SHORT).show();
 
         PodcastListAdapter pcla = new PodcastListAdapter(getApplicationContext());
         ArrayList<PodcastElement> podcastElements = new ArrayList<PodcastElement>();
@@ -144,8 +167,8 @@ public class PodcastManager extends TabActivity implements OnClickListener {
 
             // ArrayAdapter adapter = new ArrayAdapter(getApplicationContext(), android.R.layout.simple_list_item_1,
             // podcastNames);
-            PodcastListAdapter adapter = new PodcastListAdapter(getApplicationContext(), podcastElements);
-            lvPodcasts.setAdapter(adapter);
+            podcastAdapter = new PodcastListAdapter(getApplicationContext(), podcastElements);
+            lvPodcasts.setAdapter(podcastAdapter);
             lvPodcasts.setOnItemClickListener(new OnItemClickListener() {
 
                 @Override
@@ -166,7 +189,6 @@ public class PodcastManager extends TabActivity implements OnClickListener {
     }
 
     private void showDownloads() {
-        
 
         // get preferences
         pref = Preferences.getPreferences(getApplicationContext());
@@ -186,7 +208,7 @@ public class PodcastManager extends TabActivity implements OnClickListener {
         pcla = new PodcastListAdapter(this);
         pcla.setShowCheckbox(true);
         downloadProcessing();
-        
+
         Button downloadButton = (Button) findViewById(R.id.downloadButton);
         final Intent intent = new Intent(this, DownloadService.class);
         downloadButton.setOnClickListener(new OnClickListener() {
@@ -225,8 +247,8 @@ public class PodcastManager extends TabActivity implements OnClickListener {
 
     private void backgroundPodcastInfoFetcher() {
         GpodderUpdates podcast = GpodderAPI.getDownloadList();
-        
-        if(podcast == null){
+
+        if (podcast == null) {
             Log.e(GpodRoid.LOGTAG, "cant display downloads, got empty result");
             return;
         }
