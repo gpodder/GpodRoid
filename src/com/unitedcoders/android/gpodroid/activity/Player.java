@@ -32,6 +32,7 @@ public class Player extends Activity {
     public static ArrayList<PodcastElement> playbackQueue = new ArrayList<PodcastElement>();
 
     // private static boolean mpIsPlaying = false;
+    TextView title;
     TextView episode;
 
     @Override
@@ -53,7 +54,7 @@ public class Player extends Activity {
 
         // getting state
         episode = (TextView) findViewById(R.id.EpisodeName);
-        // title = (TextView) findViewById(R.id.PodcastTitle);
+        title = (TextView) findViewById(R.id.PodcastTitle);
 
         // pretend state is empty
 
@@ -102,6 +103,9 @@ public class Player extends Activity {
         }
         
         episode.setText(playingNow.getAlbum());
+        title.setText(playingNow.getTitle());
+        
+        playbackQueue.remove(0);
 
     }
 
