@@ -135,7 +135,6 @@ public class DownloadService extends Service {
                     
                 } finally{
                     downloadQueue.remove(0);
-                    PodcastManager.podcastAdapter.notifyDataSetChanged();
                 }
 
                 // Toast.makeText(this, "download ended", Toast.LENGTH_LONG);

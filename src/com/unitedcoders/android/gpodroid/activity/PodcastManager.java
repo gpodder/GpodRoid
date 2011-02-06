@@ -42,7 +42,7 @@ public class PodcastManager extends TabActivity implements OnClickListener {
     private ListView lvPodcasts;
     private ListView lvDownloads;
 
-    public static PodcastListAdapter podcastAdapter;
+    private PodcastListAdapter podcastAdapter;
 
     private ArrayAdapter adapter;
     private ViewFlipper sdcardFlipper;
@@ -52,6 +52,8 @@ public class PodcastManager extends TabActivity implements OnClickListener {
     private Preferences pref;
 
     private boolean podcastSubmenu = false;
+    
+    public static boolean archiveDirty = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,6 +108,8 @@ public class PodcastManager extends TabActivity implements OnClickListener {
         return true;
     }
 
+    
+    
     private void showArchive() {
         podcastSubmenu = false;
         File podcastDir = new File("/sdcard/gpodder");

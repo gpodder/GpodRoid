@@ -1,6 +1,5 @@
 package com.unitedcoders.android.gpodroid;
 
-import java.io.File;
 
 public class PodcastElement implements Comparable<PodcastElement> {
 
