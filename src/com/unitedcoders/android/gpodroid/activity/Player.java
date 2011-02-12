@@ -82,10 +82,18 @@ public class Player extends Activity implements OnClickListener {
         forward.setOnClickListener(this);
         backward.setOnClickListener(this);
 
+        buttonStop.setBackgroundResource(R.drawable.play);
+
         buttonStop.setOnClickListener(new OnClickListener() {
 
             @Override
             public void onClick(View v) {
+
+                if (pce == null) {
+                    Intent intent = new Intent(getApplicationContext(), PodcastManager.class);
+                    startActivity(intent);
+                }
+
                 if (mp.isPlaying()) {
                     mp.pause();
                     buttonStop.setBackgroundResource(R.drawable.play);
@@ -161,9 +169,9 @@ public class Player extends Activity implements OnClickListener {
 
 
         if (view == backward) {
-            seek(-15000);
+            seek(- mp.getDuration()/50);
         } else if (view == forward) {
-            seek(+15000);
+            seek(mp.getDuration()/50);
         }
 
 
