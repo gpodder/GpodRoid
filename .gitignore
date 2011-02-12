@@ -1,3 +1,8 @@
 gen
 bin
 local.properties
+.project
+.directory
+.classpath
+out
+.idea

@@ -1,46 +1,64 @@
 package com.unitedcoders.android.gpodroid.activity;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.unitedcoders.android.gpodroid.GpodRoid;
 import com.unitedcoders.android.gpodroid.PodcastElement;
 import com.unitedcoders.android.gpodroid.Preferences;
 import com.unitedcoders.android.gpodroid.R;
+import com.unitedcoders.android.gpodroid.tools.PodcastUtil;
 
 /**
  * Shows the MediaPlayer and controls
- * 
+ *
  * @author Nico Heid
- * 
  */
-public class Player extends Activity {
+public class Player extends Activity implements OnClickListener {
 
     // private static File podcast;
     private static MediaPlayer mp = new MediaPlayer();
 
-    // the playback queue
-    public static ArrayList<PodcastElement> playbackQueue = new ArrayList<PodcastElement>();
+    // Element playing
+    public static PodcastElement pce;
+    private int seekPosition = 0;
 
-    // private static boolean mpIsPlaying = false;
-    TextView title;
-    TextView episode;
+    private TextView title;
+    private TextView episode;
+
+    // Buttons
+    private ImageButton forward;
+    private ImageButton backward;
+    private ImageButton buttonStop;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         // TODO Auto-generated method stub
         super.onCreate(savedInstanceState);
         setContentView(R.layout.playerview);
-        
+
+        SharedPreferences settings = getApplicationContext().getSharedPreferences("PLAYBACKSTATE", 0);
+        String file = settings.getString("FILE", "");
+        seekPosition = settings.getInt("SEEKPOSITION", 0);
+
+        if (!file.equals("")) {
+            pce = PodcastUtil.getPodcastInfo(new File(file));
+        }
+
+
         // load preferences
         GpodRoid.prefs = Preferences.getPreferences(getApplicationContext());
 
@@ -56,44 +74,70 @@ public class Player extends Activity {
         episode = (TextView) findViewById(R.id.EpisodeName);
         title = (TextView) findViewById(R.id.PodcastTitle);
 
-        // pretend state is empty
+        forward = (ImageButton) findViewById(R.id.btn_forward);
+        backward = (ImageButton) findViewById(R.id.btn_backward);
+        buttonStop = (ImageButton) findViewById(R.id.buttonPlay);
 
-        final Button buttonStop = (Button) findViewById(R.id.buttonPlay);
+
+        forward.setOnClickListener(this);
+        backward.setOnClickListener(this);
+
         buttonStop.setOnClickListener(new OnClickListener() {
 
             @Override
             public void onClick(View v) {
-                if(mp.isPlaying()){
+                if (mp.isPlaying()) {
                     mp.pause();
-                    buttonStop.setText("Play");
-                }else{
-                    mp.start();
-                    buttonStop.setText("Pause");
-                }
-                
+                    buttonStop.setBackgroundResource(R.drawable.play);
+                    SharedPreferences settings = getApplicationContext().getSharedPreferences("PLAYBACKSTATE", 0);
+                    SharedPreferences.Editor editor = settings.edit();
 
+                    editor.putString("FILE", pce.getFile());
+                    editor.putInt("SEEKPOSITION", mp.getCurrentPosition());
+                    editor.commit();
+
+
+                } else {
+                    mp.start();
+                    buttonStop.setBackgroundResource(R.drawable.pause);
+                }
             }
         });
 
-        
 
         play();
 
     }
 
+    @Override
+    protected void onDestroy() {
+        if (pce != null) {
+            // save playback state
+            SharedPreferences settings = getApplicationContext().getSharedPreferences("PLAYBACKSTATE", 0);
+            SharedPreferences.Editor editor = settings.edit();
+
+            editor.putString("FILE", pce.getFile());
+            editor.putInt("SEEKPOSITION", mp.getCurrentPosition());
+            editor.commit();
+        }
+
+        super.onDestroy();
+
+    }
+
     private void play() {
 
-        if (playbackQueue.size() == 0) {
+        if (pce == null) {
             return;
         }
-        
-        PodcastElement playingNow = playbackQueue.get(0);
-        
+
         try {
             mp.reset();
-            mp.setDataSource(playingNow.getFile());
+            mp.setDataSource(pce.getFile());
             mp.prepare();
+            mp.seekTo(seekPosition);
             mp.start();
+            buttonStop.setBackgroundResource(R.drawable.pause);
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
         } catch (IllegalStateException e) {
@@ -101,11 +145,9 @@ public class Player extends Activity {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        
-        episode.setText(playingNow.getAlbum());
-        title.setText(playingNow.getTitle());
-        
-        playbackQueue.remove(0);
+
+        episode.setText(pce.getAlbum());
+        title.setText(pce.getTitle());
 
     }
 
@@ -114,4 +156,21 @@ public class Player extends Activity {
         startActivity(intent);
     }
 
+    @Override
+    public void onClick(View view) {
+
+
+        if (view == backward) {
+            seek(-15000);
+        } else if (view == forward) {
+            seek(+15000);
+        }
+
+
+    }
+
+    private void seek(int seek) {
+        int position = mp.getCurrentPosition();
+        mp.seekTo(position + seek);
+    }
 }

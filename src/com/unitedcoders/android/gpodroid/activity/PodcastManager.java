@@ -7,6 +7,7 @@ import java.util.List;
 
 import android.app.TabActivity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -52,7 +53,7 @@ public class PodcastManager extends TabActivity implements OnClickListener {
     private Preferences pref;
 
     private boolean podcastSubmenu = false;
-    
+
     public static boolean archiveDirty = false;
 
     @Override
@@ -108,8 +109,7 @@ public class PodcastManager extends TabActivity implements OnClickListener {
         return true;
     }
 
-    
-    
+
     private void showArchive() {
         podcastSubmenu = false;
         File podcastDir = new File("/sdcard/gpodder");
@@ -178,9 +178,20 @@ public class PodcastManager extends TabActivity implements OnClickListener {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View arg1, int position, long arg3) {
                     // TODO Auto-generated method stub
-                    Toast.makeText(getApplicationContext(), "starting media player", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "starting podcast", Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(getApplicationContext(), Player.class);
-                    Player.playbackQueue.add((PodcastElement) parent.getItemAtPosition(position));
+                    PodcastElement pce = (PodcastElement) parent.getItemAtPosition(position);
+                    Player.pce = pce;
+
+                    // set new playback state
+                    SharedPreferences settings = getApplicationContext().getSharedPreferences("PLAYBACKSTATE", 0);
+                    SharedPreferences.Editor editor = settings.edit();
+
+                    editor.putString("FILE", pce.getFile());
+                    editor.putInt("SEEKPOSITION", 0);
+                    editor.commit();
+
+
                     startActivity(intent);
 
                 }

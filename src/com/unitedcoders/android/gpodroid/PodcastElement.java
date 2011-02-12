@@ -1,5 +1,7 @@
 package com.unitedcoders.android.gpodroid;
 
+import java.io.File;
+
 
 public class PodcastElement implements Comparable<PodcastElement> {
 
@@ -7,8 +9,26 @@ public class PodcastElement implements Comparable<PodcastElement> {
     private String downloadUrl;
     private String album;
     private String file;
-    
-    
+    private int seekPosition = 0;
+
+
+    public PodcastElement(String title, String downloadUrl) {
+        this.title = title;
+        this.downloadUrl = downloadUrl;
+
+    }
+
+    public PodcastElement(File file) {
+
+    }
+
+    public int getSeekPosition() {
+        return seekPosition;
+    }
+
+    public void setSeekPosition(int seekPosition) {
+        this.seekPosition = seekPosition;
+    }
 
     public String getFile() {
         return file;
@@ -37,11 +57,6 @@ public class PodcastElement implements Comparable<PodcastElement> {
 
     }
 
-    public PodcastElement(String title, String downloadUrl) {
-        this.title = title;
-        this.downloadUrl = downloadUrl;
-
-    }
 
     @Override
     public int compareTo(PodcastElement another) {

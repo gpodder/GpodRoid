@@ -23,6 +23,7 @@ public class Preferences {
     private String password = "";
     private String device = "";
 
+
     private Preferences() {
 
     }
