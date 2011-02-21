@@ -14,7 +14,7 @@
 			<ViewFlipper android:id="@+id/tabmgr_sdcard"
 				android:layout_width="fill_parent" android:layout_height="fill_parent">
 
-				<ListView android:id="@+id/lv_albums" android:layout_width="fill_parent"
+				<ListView android:id="@+id/lv_shows" android:layout_width="fill_parent"
 					android:layout_height="fill_parent" />
 				<ListView android:id="@+id/lv_podcasts"
 					android:layout_width="fill_parent" android:layout_height="wrap_content" />

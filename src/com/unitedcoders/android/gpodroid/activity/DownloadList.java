@@ -11,7 +11,6 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.unitedcoders.android.gpodroid.GpodRoid;
-import com.unitedcoders.android.gpodroid.PodcastElement;
 import com.unitedcoders.android.gpodroid.PodcastListAdapter;
 import com.unitedcoders.android.gpodroid.Preferences;
 import com.unitedcoders.android.gpodroid.R;
@@ -51,8 +50,8 @@ public class DownloadList extends ListActivity {
 
         // add items to download list
         for (int i = 0; i < podcast.getUpdates().size(); i++) {
-            pcla.addItem(new PodcastElement(podcast.getUpdates().get(i).getTitle(), podcast.getUpdates().get(i)
-                    .getUrl()));
+//            pcla.addItem(new PodcastElement(podcast.getUpdates().get(i).getTitle(), podcast.getUpdates().get(i)
+//                    .getUrl()));
         }
 
         setListAdapter(pcla);
@@ -66,7 +65,7 @@ public class DownloadList extends ListActivity {
 
                 String download = null;
 
-                List<PodcastElement> checkedItems = pcla.getCheckedItems();
+//                List<PodcastElement> checkedItems = pcla.getCheckedItems();
 //                for (PodcastElement pce : checkedItems) {
 //                    GpodRoid.addDownloadQueue(pce);
 //                }

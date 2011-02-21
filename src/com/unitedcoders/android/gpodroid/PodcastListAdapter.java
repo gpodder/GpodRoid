@@ -7,6 +7,7 @@ import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import com.unitedcoders.gpodder.GpodderPodcast;
 
 public class PodcastListAdapter extends BaseAdapter {
 
@@ -21,13 +22,13 @@ public class PodcastListAdapter extends BaseAdapter {
     }
 
     private Context context;
-    private List<PodcastElement> podcasts = new ArrayList<PodcastElement>();
+    private List<GpodderPodcast> podcasts = new ArrayList<GpodderPodcast>();
 
     public PodcastListAdapter(Context context) {
         this.context = context;
     }
 
-    public PodcastListAdapter(Context context, List<PodcastElement> podcasts) {
+    public PodcastListAdapter(Context context, List<GpodderPodcast> podcasts) {
         this.context = context;
         this.podcasts = podcasts;
     }
@@ -47,7 +48,7 @@ public class PodcastListAdapter extends BaseAdapter {
         return 0;
     }
 
-    public void addItem(PodcastElement podcast) {
+    public void addItem(GpodderPodcast podcast) {
         podcasts.add(podcast);
     }
 
@@ -58,16 +59,16 @@ public class PodcastListAdapter extends BaseAdapter {
 
         if (showCheckbox) {
             if (convertView == null) {
-                view = new DownloadView(context, podcasts.get(position), showCheckbox);
+                view = new PodcastListView(context, podcasts.get(position));
             } else {
-                view = (DownloadView) convertView;
+                view = (PodcastListView) convertView;
             }
 
         } else {
             if (convertView == null) {
-                view = new PodcastView(context, podcasts.get(position));
+                view = new PodcastListView(context, podcasts.get(position));
             } else {
-                view = (PodcastView) convertView;
+                view = (PodcastListView) convertView;
             }
             
         }
@@ -76,9 +77,9 @@ public class PodcastListAdapter extends BaseAdapter {
 
     }
 
-    public List<PodcastElement> getCheckedItems() {
-        List<PodcastElement> result = new ArrayList<PodcastElement>();
-        for (PodcastElement pe : podcasts) {
+    public List<GpodderPodcast> getCheckedItems() {
+        List<GpodderPodcast> result = new ArrayList<GpodderPodcast>();
+        for (GpodderPodcast pe : podcasts) {
             if (pe.isChecked()) {
                 result.add(pe);
             }

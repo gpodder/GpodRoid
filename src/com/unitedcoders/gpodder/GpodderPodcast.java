@@ -2,6 +2,7 @@ package com.unitedcoders.gpodder;
 
 public class GpodderPodcast {
 
+    private int id;
 	private String title;
 	private String podcast_url;
 	private String podcast_title;
@@ -11,8 +12,25 @@ public class GpodderPodcast {
 	private String released;
 	private String status;
 	private String url;
+    private boolean checked = false;
 
-	public String getUrl() {
+    public boolean isChecked() {
+        return checked;
+    }
+
+    public void setChecked(boolean checked) {
+        this.checked = checked;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getUrl() {
 		return url;
 	}
 
