@@ -12,13 +12,12 @@ public class GpodDBHelper extends SQLiteOpenHelper {
 
     // Database creation sql statement
     private static final String DATABASE_CREATE = "CREATE TABLE \"podcast\" (\n" +
-            "    \"id\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,\n" +
-            "    \"file\" TEXT NOT NULL,\n" +
-            "    \"title\" TEXT,\n" +
-            "    \"show\" TEXT,\n" +
-            "    \"downloaded\" INTEGER,\n" +
-            "    \"played\" INTEGER\n" +
-            ")";
+            "    \"file\" TEXT, " +
+            "    \"title\" TEXT, " +
+            "    \"show\" TEXT, " +
+            "    \"downloaded\" INTEGER, " +
+            "    \"played\" INTEGER, " +
+            " PRIMARY KEY(title, show))";
 
 
 

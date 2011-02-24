@@ -1,6 +1,5 @@
 package com.unitedcoders.android.gpodroid.activity;
 
-import java.util.Iterator;
 import java.util.List;
 
 import android.app.TabActivity;
@@ -31,7 +30,7 @@ public class PodcastManager extends TabActivity implements OnClickListener {
     // podcasts in archive
     private ListView lvShows;
     private ListView lvPodcasts;
-    private ListView lvDownloads;
+//    private ListView lvDownloads;
 
     private ViewFlipper sdcardFlipper;
     private PodcastListAdapter podcastAdapter;
@@ -53,15 +52,14 @@ public class PodcastManager extends TabActivity implements OnClickListener {
 
         lvShows = (ListView) findViewById(R.id.lv_shows);
         lvPodcasts = (ListView) findViewById(R.id.lv_podcasts);
-        lvDownloads = (ListView) findViewById(R.id.lv_downloads);
 
         sdcardFlipper = (ViewFlipper) findViewById(R.id.tabmgr_sdcard);
         sdcardFlipper.setOnClickListener(this);
 
         mTabHost = getTabHost();
 
-        mTabHost.addTab(mTabHost.newTabSpec("tab_test1").setIndicator("Archive").setContent(R.id.tabmgr_sdcard));
-        mTabHost.addTab(mTabHost.newTabSpec("tab_test2").setIndicator("New").setContent(R.id.tabmgr_newpodcasts));
+        mTabHost.addTab(mTabHost.newTabSpec("tab_test1").setIndicator("Podcasts").setContent(R.id.tabmgr_sdcard));
+//        mTabHost.addTab(mTabHost.newTabSpec("tab_test2").setIndicator("New").setContent(R.id.tabmgr_newpodcasts));
         mTabHost.addTab(mTabHost.newTabSpec("tab_test3").setIndicator("Subscriptions")
                 .setContent(R.id.tabmgr_subscriptions));
 
@@ -69,7 +67,7 @@ public class PodcastManager extends TabActivity implements OnClickListener {
 
         downloadProcessing();
         showShows();
-//        showPodcasts();
+//        showDownloads();
 
     }
 
@@ -135,7 +133,7 @@ public class PodcastManager extends TabActivity implements OnClickListener {
         podcastSubmenu = false;
 
         GpodDB db = new GpodDB(getApplicationContext());
-        List<String> shows = db.getShows();
+        List<String> shows = db.getPodcasts();
 
         showAdapter = new ArrayAdapter(getApplicationContext(), android.R.layout.simple_list_item_1, shows);
         lvShows.setAdapter(showAdapter);
@@ -219,26 +217,34 @@ public class PodcastManager extends TabActivity implements OnClickListener {
 
         }
 
-        pcla = new PodcastListAdapter(this);
-        pcla.setShowCheckbox(true);
+//        pcla = new PodcastListAdapter(this);
+//        pcla.setShowCheckbox(true);
         downloadProcessing();
 
-        Button downloadButton = (Button) findViewById(R.id.downloadButton);
-        final Intent intent = new Intent(this, DownloadService.class);
-        downloadButton.setOnClickListener(new OnClickListener() {
+//        // show what we have from db
+//        GpodDB db = new GpodDB(getApplicationContext());
+//        List<String> podcasts = db.getPodcasts();
+//
+//        ArrayAdapter downloads = new ArrayAdapter(getApplicationContext(), android.R.layout.simple_list_item_1, podcasts);
+//        lvDownloads.setAdapter(downloads);
 
-            @Override
-            public void onClick(View v) {
 
-//                List<PodcastElement> checkedItems = pcla.getCheckedItems();
-//                for (PodcastElement pce : checkedItems) {
-//                    DownloadService.downloadQueue.add(pce);
-//                }
-
-                startService(intent);
-
-            }
-        });
+//        Button downloadButton = (Button) findViewById(R.id.downloadButton);
+//        final Intent intent = new Intent(this, DownloadService.class);
+//        downloadButton.setOnClickListener(new OnClickListener() {
+//
+//            @Override
+//            public void onClick(View v) {
+//
+////                List<PodcastElement> checkedItems = pcla.getCheckedItems();
+////                for (PodcastElement pce : checkedItems) {
+////                    DownloadService.downloadQueue.add(pce);
+////                }
+//
+//                startService(intent);
+//
+//            }
+//        });
     }
 
     private void downloadProcessing() {
@@ -248,7 +254,7 @@ public class PodcastManager extends TabActivity implements OnClickListener {
 
     private Runnable doUpdateDownloadList = new Runnable() {
         public void run() {
-            lvDownloads.setAdapter(pcla);
+//            lvDownloads.setAdapter(pcla);
 
         }
     };
@@ -274,12 +280,12 @@ public class PodcastManager extends TabActivity implements OnClickListener {
 
 
         // add items to download list
-        for (int i = 0; i < podcast.getUpdates().size(); i++) {
-//            pcla.addItem(new PodcastElement(podcast.getUpdates().get(i).getTitle(), podcast.getUpdates().get(i)
-//                    .getUrl()));
-
-
-        }
+//        for (int i = 0; i < podcast.getUpdates().size(); i++) {
+////            pcla.addItem(new PodcastElement(podcast.getUpdates().get(i).getTitle(), podcast.getUpdates().get(i)
+////                    .getUrl()));
+//
+//
+//        }
 
         handler.post(doUpdateDownloadList);
     }
