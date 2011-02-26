@@ -2,7 +2,10 @@ package com.unitedcoders.android.gpodroid.activity;
 
 import java.util.List;
 
+import android.app.AlertDialog;
 import android.app.TabActivity;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -13,10 +16,7 @@ import android.view.View.OnClickListener;
 import android.widget.*;
 import android.widget.AdapterView.OnItemClickListener;
 
-import com.unitedcoders.android.gpodroid.GpodRoid;
-import com.unitedcoders.android.gpodroid.PodcastListAdapter;
-import com.unitedcoders.android.gpodroid.Preferences;
-import com.unitedcoders.android.gpodroid.R;
+import com.unitedcoders.android.gpodroid.*;
 import com.unitedcoders.android.gpodroid.database.GpodDB;
 import com.unitedcoders.android.gpodroid.services.DownloadService;
 import com.unitedcoders.gpodder.GpodderAPI;
@@ -24,6 +24,8 @@ import com.unitedcoders.gpodder.GpodderPodcast;
 import com.unitedcoders.gpodder.GpodderUpdates;
 
 public class PodcastManager extends TabActivity implements OnClickListener {
+
+    private Context context;
 
     private TabHost mTabHost;
 
@@ -46,6 +48,7 @@ public class PodcastManager extends TabActivity implements OnClickListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        this.context = getApplicationContext();
         // TODO Auto-generated method stub
         super.onCreate(savedInstanceState);
         setContentView(R.layout.podcast_manager);
@@ -59,13 +62,12 @@ public class PodcastManager extends TabActivity implements OnClickListener {
         mTabHost = getTabHost();
 
         mTabHost.addTab(mTabHost.newTabSpec("tab_test1").setIndicator("Podcasts").setContent(R.id.tabmgr_sdcard));
-//        mTabHost.addTab(mTabHost.newTabSpec("tab_test2").setIndicator("New").setContent(R.id.tabmgr_newpodcasts));
         mTabHost.addTab(mTabHost.newTabSpec("tab_test3").setIndicator("Subscriptions")
                 .setContent(R.id.tabmgr_subscriptions));
 
         mTabHost.setCurrentTab(0);
 
-        downloadProcessing();
+//        downloadProcessing();
         showShows();
 //        showDownloads();
 
@@ -75,9 +77,9 @@ public class PodcastManager extends TabActivity implements OnClickListener {
     public void onClick(View v) {
         // TODO Auto-generated method stub
 
-        if (v == sdcardFlipper || v == lvShows) {
-            sdcardFlipper.showNext();
-        }
+//        if (v == sdcardFlipper || v == lvShows) {
+//            sdcardFlipper.showNext();
+//        }
 
     }
 
@@ -98,31 +100,53 @@ public class PodcastManager extends TabActivity implements OnClickListener {
     }
 
 
-    private void showPodcasts(String show) {
+    private void showEpisodes(String show) {
         podcastSubmenu = true;
 //
 
         GpodDB db = new GpodDB(getApplicationContext());
-        List<GpodderPodcast> shows = db.getPodcasts(show);
+        List<Episode> shows = db.getEpisodes(show);
 
-//        podcastAdapter = new  ArrayAdapter(getApplicationContext(), android.R.layout.simple_list_item_1, shows);
         podcastAdapter = new PodcastListAdapter(getApplicationContext(), shows);
         lvPodcasts.setAdapter(podcastAdapter);
         sdcardFlipper.showNext();
-//        lvAlbums.setOnClickListener(this);
 
         lvPodcasts.setOnItemClickListener(new OnItemClickListener() {
 
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//                String album = (String) parent.getItemAtPosition(position);
-//                showPodcast(album);
-//                sdcardFlipper.showNext();
 
-                Toast.makeText(getApplicationContext(), "starting podcast", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(getApplicationContext(), Player.class);
-                Player.pce = (GpodderPodcast) parent.getItemAtPosition(position);
-                startActivity(intent);
+                // ask for download if not present, or start playing
+                final Episode episode = (Episode) parent.getItemAtPosition(position);
+                final Intent downloadService = new Intent(getApplicationContext(), DownloadService.class);
+                if (episode.getDownloaded() == 0) {
+
+                    // get confirmation for download
+                    final AlertDialog alert = new AlertDialog.Builder(lvPodcasts.getContext()).create();
+                    alert.setTitle("Download");
+                    alert.setMessage("Download Podcast now?");
+                    alert.setButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            DownloadService.downloadQueue.add(episode);
+                            startService(downloadService);
+                        }
+                    });
+                    alert.setButton2("CANCEL", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            alert.cancel();
+                        }
+                    });
+                    alert.show();
+
+
+                } else {
+                    Toast.makeText(getApplicationContext(), "starting podcast", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(getApplicationContext(), Player.class);
+                    Player.pce = episode;
+                    startActivity(intent);
+                }
 
             }
         });
@@ -145,58 +169,11 @@ public class PodcastManager extends TabActivity implements OnClickListener {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String show = (String) parent.getItemAtPosition(position);
-                showPodcasts(show);
+                showEpisodes(show);
 
             }
         });
-//
-//        // Toast.makeText(getApplicationContext(), "showing " + album, Toast.LENGTH_SHORT).show();
-//
-//        PodcastListAdapter pcla = new PodcastListAdapter(getApplicationContext());
-//        ArrayList<PodcastElement> podcastElements = new ArrayList<PodcastElement>();
-//
-//        try {
-//            Iterator it = podcastArchive.iterator();
-//            while (it.hasNext()) {
-//                PodcastElement pce = (PodcastElement) it.next();
-//                if (pce != null && pce.getAlbum() != null && pce.getAlbum().equals(album) && pce.getTitle() != null
-//                        && pce.getTitle().length() > 0) {
-//                    // podcastArchive.add(pce);
-//                    podcastElements.add(pce);
-//                }
-//            }
-//
-//            // ArrayAdapter podcastAdapter = new ArrayAdapter(getApplicationContext(), android.R.layout.simple_list_item_1,
-//            // podcastNames);
-//            podcastAdapter = new PodcastListAdapter(getApplicationContext(), podcastElements);
-//            lvPodcasts.setAdapter(podcastAdapter);
-//            lvPodcasts.setOnItemClickListener(new OnItemClickListener() {
-//
-//                @Override
-//                public void onItemClick(AdapterView<?> parent, View arg1, int position, long arg3) {
-//                    Toast.makeText(getApplicationContext(), "starting podcast", Toast.LENGTH_SHORT).show();
-//                    Intent intent = new Intent(getApplicationContext(), Player.class);
-//                    PodcastElement pce = (PodcastElement) parent.getItemAtPosition(position);
-//                    Player.pce = pce;
-//
-//                    // set new playback state
-//                    SharedPreferences settings = getApplicationContext().getSharedPreferences("PLAYBACKSTATE", 0);
-//                    SharedPreferences.Editor editor = settings.edit();
-//
-//                    editor.putString("FILE", pce.getFile());
-//                    editor.putInt("SEEKPOSITION", 0);
-//                    editor.commit();
-//
-//
-//                    startActivity(intent);
-//
-//                }
-//            }
-//    );
-//
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
+
 
     }
 
@@ -217,34 +194,8 @@ public class PodcastManager extends TabActivity implements OnClickListener {
 
         }
 
-//        pcla = new PodcastListAdapter(this);
-//        pcla.setShowCheckbox(true);
         downloadProcessing();
 
-//        // show what we have from db
-//        GpodDB db = new GpodDB(getApplicationContext());
-//        List<String> podcasts = db.getPodcasts();
-//
-//        ArrayAdapter downloads = new ArrayAdapter(getApplicationContext(), android.R.layout.simple_list_item_1, podcasts);
-//        lvDownloads.setAdapter(downloads);
-
-
-//        Button downloadButton = (Button) findViewById(R.id.downloadButton);
-//        final Intent intent = new Intent(this, DownloadService.class);
-//        downloadButton.setOnClickListener(new OnClickListener() {
-//
-//            @Override
-//            public void onClick(View v) {
-//
-////                List<PodcastElement> checkedItems = pcla.getCheckedItems();
-////                for (PodcastElement pce : checkedItems) {
-////                    DownloadService.downloadQueue.add(pce);
-////                }
-//
-//                startService(intent);
-//
-//            }
-//        });
     }
 
     private void downloadProcessing() {
@@ -277,15 +228,6 @@ public class PodcastManager extends TabActivity implements OnClickListener {
 
         List<GpodderPodcast> pcl = podcast.getUpdates();
         gpdb.addPodcasts(pcl);
-
-
-        // add items to download list
-//        for (int i = 0; i < podcast.getUpdates().size(); i++) {
-////            pcla.addItem(new PodcastElement(podcast.getUpdates().get(i).getTitle(), podcast.getUpdates().get(i)
-////                    .getUrl()));
-//
-//
-//        }
 
         handler.post(doUpdateDownloadList);
     }

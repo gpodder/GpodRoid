@@ -17,8 +17,8 @@ public class GpodDBHelper extends SQLiteOpenHelper {
             "    \"show\" TEXT, " +
             "    \"downloaded\" INTEGER, " +
             "    \"played\" INTEGER, " +
+            "     \"url\" TEXT, " +
             " PRIMARY KEY(title, show))";
-
 
 
     public GpodDBHelper(Context context) {

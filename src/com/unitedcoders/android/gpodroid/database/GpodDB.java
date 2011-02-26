@@ -4,8 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
-import android.database.sqlite.SQLiteQueryBuilder;
+import com.unitedcoders.android.gpodroid.Episode;
 import com.unitedcoders.gpodder.GpodderPodcast;
 
 import java.util.ArrayList;
@@ -47,49 +46,71 @@ public class GpodDB {
             // do we know this one?
             String podcast = gpodderPodcast.getPodcast_title();
             String show = gpodderPodcast.getTitle();
-            Cursor c =db.query(DATABASE_TABLE, new String[]{"title"}, "show=? and title=?" ,
-                    new String[]{show,podcast}, null, null, null,"1");
+            Cursor c = db.query(DATABASE_TABLE, new String[]{"title"}, "show=? and title=?",
+                    new String[]{show, podcast}, null, null, null, "1");
 
 //            Cursor c = db.rawQuery("select title from " + DATABASE_TABLE + " where show=? and title=? limit 1",
 //                    new String[]{show, podcast});
 
             if (c.getCount() > 0) {
-//                c.close();
+                c.close();
                 continue;
             }
-//            c.close();
 
 
             ContentValues map = new ContentValues();
             map.put("file", "");
             map.put("show", gpodderPodcast.getTitle());
             map.put("title", gpodderPodcast.getPodcast_title());
+            map.put("url", gpodderPodcast.getUrl());
             map.put("downloaded", 0);
             map.put("played", 0);
 
             long l = db.insert(DATABASE_TABLE, null, map);
+            c.close();
         }
+
+
+        close();
+
+
+    }
+
+    public void updateEpisode(Episode episode) {
+        open();
+        ContentValues values = new ContentValues();
+        values.put("downloaded", 1);
+        values.put("file", episode.getFile());
+
+        db.update(DATABASE_TABLE, values, "show =? and title=?",
+                new String[]{episode.getTitle(), episode.getPodcast_title()});
 
         close();
 
     }
 
-    public List<GpodderPodcast> getPodcasts(String title) {
+    public List<Episode> getEpisodes(String title) {
         open();
-        Cursor c = db.query(DATABASE_TABLE, new String[]{"show"}, "title=?", new String[]{title}, null, null, null);
+        Cursor c = db.query(DATABASE_TABLE, new String[]{"show, title, downloaded, url, file"},
+                "title=?", new String[]{title}, null, null, null);
 
-        ArrayList<GpodderPodcast> podcasts = new ArrayList<GpodderPodcast>();
+        ArrayList<Episode> podcasts = new ArrayList<Episode>();
 
         if (c.getCount() != 0) {
             while (!c.isLast()) {
                 c.moveToNext();
-                GpodderPodcast pce = new GpodderPodcast();
+                Episode pce = new Episode(new GpodderPodcast());
                 pce.setTitle(c.getString(0));
+                pce.setPodcast_title(c.getString(1));
+                pce.setDownloaded(c.getInt(2));
+                pce.setUrl(c.getString(3));
+                pce.setFile(c.getString(4));
+
                 podcasts.add(pce);
             }
         }
 
-
+        c.close();
         close();
         return podcasts;
 

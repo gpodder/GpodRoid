@@ -1,13 +1,5 @@
 package com.unitedcoders.android.gpodroid.services;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.ArrayList;
-
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -17,17 +9,24 @@ import android.os.Environment;
 import android.os.IBinder;
 import android.util.Log;
 import android.widget.RemoteViews;
-
-import com.unitedcoders.android.gpodroid.PodcastElement;
+import com.unitedcoders.android.gpodroid.Episode;
 import com.unitedcoders.android.gpodroid.R;
-import com.unitedcoders.android.gpodroid.activity.DownloadList;
 import com.unitedcoders.android.gpodroid.activity.PodcastManager;
+import com.unitedcoders.android.gpodroid.database.GpodDB;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.ArrayList;
 
 public class DownloadService extends Service {
     private int podDownloadedSize, podTotalSize;
     private Intent intent;
-    
-    public static ArrayList<PodcastElement> downloadQueue = new ArrayList<PodcastElement>();
+
+    public static ArrayList<Episode> downloadQueue = new ArrayList<Episode>();
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -56,11 +55,12 @@ public class DownloadService extends Service {
     private Thread downloadPodcast = new Thread() {
 
         public void run() {
-            PodcastElement pce = null;
-            while (downloadQueue.size() > 0 && (pce = downloadQueue.get(0)) != null) {
+            Episode episode = null;
+            while (downloadQueue.size() > 0 && (episode = downloadQueue.get(0)) != null) {
                 try {
-                    Log.d("Gpodroid", "starting download "+pce.getDownloadurl());
-                    URL podcastURL = new URL(pce.getDownloadurl());
+                    String downloadUrl = episode.getUrl();
+                    Log.d("Gpodroid", "starting download " + downloadUrl);
+                    URL podcastURL = new URL(downloadUrl);
                     HttpURLConnection urlConnection = (HttpURLConnection) podcastURL.openConnection();
                     urlConnection.setRequestMethod("GET");
                     urlConnection.setDoOutput(true);
@@ -68,7 +68,7 @@ public class DownloadService extends Service {
                     urlConnection.connect();
 
                     File SDCardRoot = Environment.getExternalStorageDirectory();
-                    new File(SDCardRoot+"/gpodder/").mkdir();
+                    new File(SDCardRoot + "/gpodder/").mkdir();
 
                     File name = new File(podcastURL.toString());
                     String saveName = name.getName().trim();
@@ -87,14 +87,14 @@ public class DownloadService extends Service {
                     notification.flags = notification.flags | Notification.FLAG_ONGOING_EVENT;
                     notification.contentView = new RemoteViews(getApplicationContext().getPackageName(),
                             R.layout.download_progress);
-                    Intent intent = new Intent(getApplicationContext(), DownloadList.class);
+                    Intent intent = new Intent(getApplicationContext(), PodcastManager.class);
                     final PendingIntent pendingIntent = PendingIntent
                             .getActivity(getApplicationContext(), 0, intent, 0);
 
                     notification.contentIntent = pendingIntent;
 
                     notification.contentView.setImageViewResource(R.id.status_icon, R.drawable.ic_menu_save);
-                    notification.contentView.setTextViewText(R.id.status_text, pce.getTitle());
+                    notification.contentView.setTextViewText(R.id.status_text, episode.getTitle());
 
                     notification.contentView.setProgressBar(R.id.status_progress, podTotalSize, podDownloadedSize,
                             false);
@@ -129,11 +129,19 @@ public class DownloadService extends Service {
 
                     notificationManager.cancel(42);
                     fileOutput.close();
-                    
+
+                    GpodDB db = new GpodDB(getApplicationContext());
+                    episode.setFile(file.getAbsolutePath());
+                    episode.setDownloaded(1);
+                    db.updateEpisode(episode);
+
+
+
+
                 } catch (IOException e) {
-                    Log.e("Gpodroid", "error when downloading "+pce.getDownloadurl(), e);
-                    
-                } finally{
+                    Log.e("Gpodroid", "error when downloading " + episode.getPodcast_url(), e);
+
+                } finally {
                     downloadQueue.remove(0);
                 }
 

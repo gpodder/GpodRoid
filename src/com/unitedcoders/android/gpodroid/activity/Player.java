@@ -15,6 +15,7 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.unitedcoders.android.gpodroid.Episode;
 import com.unitedcoders.android.gpodroid.GpodRoid;
 import com.unitedcoders.android.gpodroid.Preferences;
 import com.unitedcoders.android.gpodroid.R;
@@ -31,7 +32,7 @@ public class Player extends Activity implements OnClickListener {
     private static MediaPlayer mp = new MediaPlayer();
 
     // Element playing
-    public static GpodderPodcast pce;
+    public static Episode pce;
     private int seekPosition = 0;
 
     private TextView title;
@@ -83,78 +84,78 @@ public class Player extends Activity implements OnClickListener {
 
         buttonStop.setBackgroundResource(R.drawable.play);
 
-//        buttonStop.setOnClickListener(new OnClickListener() {
-//
-////            @Override
-////            public void onClick(View v) {
-////
-////                if (pce == null) {
-////                    Intent intent = new Intent(getApplicationContext(), PodcastManager.class);
-////                    startActivity(intent);
-////                }
-////
-////                if (mp.isPlaying()) {
-////                    mp.pause();
-////                    buttonStop.setBackgroundResource(R.drawable.play);
-////                    SharedPreferences settings = getApplicationContext().getSharedPreferences("PLAYBACKSTATE", 0);
-////                    SharedPreferences.Editor editor = settings.edit();
-////
-////                    editor.putString("FILE", pce.getFile());
-////                    editor.putInt("SEEKPOSITION", mp.getCurrentPosition());
-////                    editor.commit();
-////
-////
-////                } else {
-////                    mp.start();
-////                    buttonStop.setBackgroundResource(R.drawable.pause);
-////                }
-////            }
-////        });
+        buttonStop.setOnClickListener(new OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+
+                if (pce == null) {
+                    Intent intent = new Intent(getApplicationContext(), PodcastManager.class);
+                    startActivity(intent);
+                }
+
+                if (mp.isPlaying()) {
+                    mp.pause();
+                    buttonStop.setBackgroundResource(R.drawable.play);
+                    SharedPreferences settings = getApplicationContext().getSharedPreferences("PLAYBACKSTATE", 0);
+                    SharedPreferences.Editor editor = settings.edit();
+
+                    editor.putString("FILE", pce.getFile());
+                    editor.putInt("SEEKPOSITION", mp.getCurrentPosition());
+                    editor.commit();
+
+
+                } else {
+                    mp.start();
+                    buttonStop.setBackgroundResource(R.drawable.pause);
+                }
+            }
+        });
 
 
         play();
 
     }
 
-//    @Override
-//    protected void onDestroy() {
-////        if (pce != null) {
-////            // save playback state
-////            SharedPreferences settings = getApplicationContext().getSharedPreferences("PLAYBACKSTATE", 0);
-////            SharedPreferences.Editor editor = settings.edit();
-////
-////            editor.putString("FILE", pce.getFile());
-////            editor.putInt("SEEKPOSITION", mp.getCurrentPosition());
-////            editor.commit();
-////        }
-//
-//        super.onDestroy();
-//
-//    }
+    @Override
+    protected void onDestroy() {
+        if (pce != null) {
+            // save playback state
+            SharedPreferences settings = getApplicationContext().getSharedPreferences("PLAYBACKSTATE", 0);
+            SharedPreferences.Editor editor = settings.edit();
+
+            editor.putString("FILE", pce.getFile());
+            editor.putInt("SEEKPOSITION", mp.getCurrentPosition());
+            editor.commit();
+        }
+
+        super.onDestroy();
+
+    }
 
     private void play() {
 
-//        if (pce == null) {
-//            return;
-//        }
-//
-//        try {
-//            mp.reset();
-//            mp.setDataSource(pce.getFile());
-//            mp.prepare();
-//            mp.seekTo(seekPosition);
-//            mp.start();
-//            buttonStop.setBackgroundResource(R.drawable.pause);
-//        } catch (IllegalArgumentException e) {
-//            e.printStackTrace();
-//        } catch (IllegalStateException e) {
-//            e.printStackTrace();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//
-//        episode.setText(pce.getAlbum());
-//        title.setText(pce.getTitle());
+        if (pce == null) {
+            return;
+        }
+
+        try {
+            mp.reset();
+            mp.setDataSource(pce.getFile());
+            mp.prepare();
+            mp.seekTo(seekPosition);
+            mp.start();
+            buttonStop.setBackgroundResource(R.drawable.pause);
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        } catch (IllegalStateException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        episode.setText(pce.getTitle());
+        title.setText(pce.getPodcast_title());
 
     }
 
@@ -168,9 +169,9 @@ public class Player extends Activity implements OnClickListener {
 
 
         if (view == backward) {
-            seek(- mp.getDuration()/50);
+            seek(-mp.getDuration() / 50);
         } else if (view == forward) {
-            seek(mp.getDuration()/50);
+            seek(mp.getDuration() / 50);
         }
 
 
