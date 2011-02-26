@@ -14,13 +14,14 @@
 		android:layout_height="wrap_content" android:text="EditText"
 		android:password="true">
 	</EditText>
-	<TextView android:layout_width="fill_parent"
-        android:layout_height="wrap_content" android:text="Device" />
 	<LinearLayout android:layout_width="fill_parent"
-		android:layout_height="wrap_content" android:orientation="horizontal"
+		android:layout_height="wrap_content" android:orientation="vertical"
 		android:layout_gravity="bottom|center">
 		<Button android:id="@+id/btn_save" android:layout_width="fill_parent"
 			android:layout_height="wrap_content" android:text="Login">
+		</Button>
+        <Button android:id="@+id/btn_register" android:layout_width="fill_parent"
+			android:layout_height="wrap_content" android:text="Register">
 		</Button>
 	</LinearLayout>
 

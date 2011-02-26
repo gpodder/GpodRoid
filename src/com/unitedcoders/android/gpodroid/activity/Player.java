@@ -19,6 +19,7 @@ import com.unitedcoders.android.gpodroid.Episode;
 import com.unitedcoders.android.gpodroid.GpodRoid;
 import com.unitedcoders.android.gpodroid.Preferences;
 import com.unitedcoders.android.gpodroid.R;
+import com.unitedcoders.android.gpodroid.services.UpdateService;
 import com.unitedcoders.gpodder.GpodderPodcast;
 
 /**
@@ -49,6 +50,8 @@ public class Player extends Activity implements OnClickListener {
         // TODO Auto-generated method stub
         super.onCreate(savedInstanceState);
         setContentView(R.layout.playerview);
+
+        startService(new Intent(getApplicationContext(), UpdateService.class));
 
         SharedPreferences settings = getApplicationContext().getSharedPreferences("PLAYBACKSTATE", 0);
         String file = settings.getString("FILE", "");

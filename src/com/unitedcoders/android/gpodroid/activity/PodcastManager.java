@@ -38,7 +38,7 @@ public class PodcastManager extends TabActivity implements OnClickListener {
     private PodcastListAdapter podcastAdapter;
     private ArrayAdapter showAdapter;
 
-    private Handler handler = new Handler();
+
     private PodcastListAdapter pcla;
     private Preferences pref;
 
@@ -177,59 +177,5 @@ public class PodcastManager extends TabActivity implements OnClickListener {
 
     }
 
-    private void showDownloads() {
-
-        // get preferences
-        pref = Preferences.getPreferences(getApplicationContext());
-
-        if (pref.getUsername().equals("") || pref.getPassword().equals("") || pref.getDevice().equals("")) {
-
-            Toast toast = Toast.makeText(getApplicationContext(), "please enter your settings first",
-                    Toast.LENGTH_SHORT);
-            toast.show();
-
-            startActivity(new Intent(getApplicationContext(), AccountSettings.class));
-
-            return;
-
-        }
-
-        downloadProcessing();
-
-    }
-
-    private void downloadProcessing() {
-        Thread thread = new Thread(null, doGetPodcastDownloadInfo, "Background");
-        thread.start();
-    }
-
-    private Runnable doUpdateDownloadList = new Runnable() {
-        public void run() {
-//            lvDownloads.setAdapter(pcla);
-
-        }
-    };
-
-    private Runnable doGetPodcastDownloadInfo = new Runnable() {
-        public void run() {
-            backgroundPodcastInfoFetcher();
-        }
-    };
-
-    private void backgroundPodcastInfoFetcher() {
-        GpodderUpdates podcast = GpodderAPI.getDownloadList();
-
-        GpodDB gpdb = new GpodDB(getApplicationContext());
-
-        if (podcast == null) {
-            Log.e(GpodRoid.LOGTAG, "cant display downloads, got empty result");
-            return;
-        }
-
-        List<GpodderPodcast> pcl = podcast.getUpdates();
-        gpdb.addPodcasts(pcl);
-
-        handler.post(doUpdateDownloadList);
-    }
 
 }

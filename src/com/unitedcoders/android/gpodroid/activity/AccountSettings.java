@@ -2,6 +2,7 @@ package com.unitedcoders.android.gpodroid.activity;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -22,30 +23,40 @@ public class AccountSettings extends Activity {
         super.onCreate(savedInstanceState);
 
         setContentView(layout.accountsettings);
-        
+
         pref = Preferences.getPreferences(getApplicationContext());
-        
+
         EditText etUsername = (EditText) findViewById(R.id.in_username);
         EditText etPassword = (EditText) findViewById(R.id.in_password);
         etUsername.setText(pref.getUsername());
         etPassword.setText(pref.getPassword());
-        
+
 
         Button save = (Button) findViewById(R.id.btn_save);
         save.setOnClickListener(new OnClickListener() {
 
             @Override
             public void onClick(View v) {
-                
+
                 pref.setUsername(((EditText) (findViewById(R.id.in_username))).getText().toString());
                 pref.setPassword(((EditText) (findViewById(R.id.in_password))).getText().toString());
                 pref.save();
-                
+
                 Intent intent = new Intent(getApplicationContext(), SelectDevice.class);
                 startActivity(intent);
                 finish();
             }
 
+        });
+
+        Button register = (Button) findViewById(R.id.btn_register);
+        register.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(Intent.ACTION_VIEW,
+                        Uri.parse("http://gpodder.net/register/"));
+                startActivity(i);
+            }
         });
 
     }
