@@ -11,9 +11,7 @@ import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.Button;
-import android.widget.ImageButton;
-import android.widget.TextView;
+import android.widget.*;
 
 import com.unitedcoders.android.gpodroid.Episode;
 import com.unitedcoders.android.gpodroid.GpodRoid;
@@ -27,7 +25,7 @@ import com.unitedcoders.gpodder.GpodderPodcast;
  *
  * @author Nico Heid
  */
-public class Player extends Activity implements OnClickListener {
+public class Player extends Activity implements OnClickListener, Runnable, SeekBar.OnSeekBarChangeListener {
 
     // private static File podcast;
     private static MediaPlayer mp = new MediaPlayer();
@@ -38,11 +36,15 @@ public class Player extends Activity implements OnClickListener {
 
     private TextView title;
     private TextView episode;
+    private TextView tvTotalTime;
+    private TextView tvPositionTime;
 
     // Buttons
     private ImageButton forward;
     private ImageButton backward;
     private ImageButton buttonStop;
+
+    private SeekBar progress;
 
 
     @Override
@@ -81,6 +83,11 @@ public class Player extends Activity implements OnClickListener {
         backward = (ImageButton) findViewById(R.id.btn_backward);
         buttonStop = (ImageButton) findViewById(R.id.buttonPlay);
 
+        progress = (SeekBar) findViewById(R.id.bar_playback);
+        progress.setOnSeekBarChangeListener(this);
+
+        tvTotalTime = (TextView) findViewById(R.id.tv_total_time);
+        tvPositionTime = (TextView) findViewById(R.id.tv_position_time);
 
         forward.setOnClickListener(this);
         backward.setOnClickListener(this);
@@ -100,13 +107,6 @@ public class Player extends Activity implements OnClickListener {
                 if (mp.isPlaying()) {
                     mp.pause();
                     buttonStop.setBackgroundResource(R.drawable.play);
-                    SharedPreferences settings = getApplicationContext().getSharedPreferences("PLAYBACKSTATE", 0);
-                    SharedPreferences.Editor editor = settings.edit();
-
-                    editor.putString("FILE", pce.getFile());
-                    editor.putInt("SEEKPOSITION", mp.getCurrentPosition());
-                    editor.commit();
-
 
                 } else {
                     mp.start();
@@ -120,21 +120,6 @@ public class Player extends Activity implements OnClickListener {
 
     }
 
-    @Override
-    protected void onDestroy() {
-        if (pce != null) {
-            // save playback state
-            SharedPreferences settings = getApplicationContext().getSharedPreferences("PLAYBACKSTATE", 0);
-            SharedPreferences.Editor editor = settings.edit();
-
-            editor.putString("FILE", pce.getFile());
-            editor.putInt("SEEKPOSITION", mp.getCurrentPosition());
-            editor.commit();
-        }
-
-        super.onDestroy();
-
-    }
 
     private void play() {
 
@@ -148,6 +133,7 @@ public class Player extends Activity implements OnClickListener {
             mp.prepare();
             mp.seekTo(seekPosition);
             mp.start();
+            new Thread(this).start();
             buttonStop.setBackgroundResource(R.drawable.pause);
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
@@ -183,5 +169,40 @@ public class Player extends Activity implements OnClickListener {
     private void seek(int seek) {
         int position = mp.getCurrentPosition();
         mp.seekTo(position + seek);
+    }
+
+    @Override
+    public void run() {
+        int currentPosition = 0;
+        int total = mp.getDuration();
+        progress.setMax(total);
+        while (mp != null && currentPosition < total) {
+            try {
+                Thread.sleep(1000);
+                currentPosition = mp.getCurrentPosition();
+            } catch (InterruptedException e) {
+                return;
+            } catch (Exception e) {
+                return;
+            }
+            progress.setProgress(currentPosition);
+        }
+    }
+
+    @Override
+    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+        if (fromUser) {
+            mp.seekTo(progress);
+        }
+    }
+
+    @Override
+    public void onStartTrackingTouch(SeekBar seekBar) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void onStopTrackingTouch(SeekBar seekBar) {
+        //To change body of implemented methods use File | Settings | File Templates.
     }
 }
