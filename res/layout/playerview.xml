@@ -13,11 +13,11 @@
                   android:layout_width="wrap_content" android:layout_height="wrap_content"
                   android:layout_gravity="center"/>
 
-        <TextView android:id="@+id/PodcastTitle" android:text="Podcast Title"
+        <TextView android:id="@+id/tv_podcast_title" android:text="Podcast Title"
                   android:layout_width="wrap_content" android:layout_height="wrap_content"
                   android:textSize="18dip" android:layout_gravity="center"/>
 
-        <TextView android:id="@+id/EpisodeName" android:text="Episode Name"
+        <TextView android:id="@+id/tv_episode_name" android:text="Episode Name"
                   android:layout_width="wrap_content" android:layout_height="wrap_content"
                   android:layout_gravity="center" android:textSize="20dip"/>
         <TextView android:id="@+id/space" android:text=""
@@ -33,7 +33,7 @@
 
             <ImageButton android:id="@+id/btn_backward" android:layout_width="wrap_content"
                          android:layout_height="wrap_content" android:src="@drawable/fastbackward"/>
-            <ImageButton android:id="@+id/buttonPlay" android:layout_width="wrap_content"
+            <ImageButton android:id="@+id/btn_play" android:layout_width="wrap_content"
                          android:layout_height="wrap_content" android:paddingLeft="10dip" android:paddingRight="10dip"/>
             <ImageButton android:id="@+id/btn_forward" android:layout_width="wrap_content"
                          android:layout_height="wrap_content" android:src="@drawable/fastforward"/>

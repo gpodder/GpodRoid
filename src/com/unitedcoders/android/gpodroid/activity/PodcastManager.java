@@ -156,6 +156,7 @@ public class PodcastManager extends TabActivity implements OnClickListener {
     private void showShows() {
         podcastSubmenu = false;
 
+
         GpodDB db = new GpodDB(getApplicationContext());
         List<String> shows = db.getPodcasts();
 

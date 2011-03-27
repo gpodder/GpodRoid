@@ -1,14 +1,17 @@
 package com.unitedcoders.android.gpodroid.services;
 
 import android.app.Service;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
 import com.unitedcoders.android.gpodroid.GpodRoid;
 import com.unitedcoders.android.gpodroid.Preferences;
+import com.unitedcoders.android.gpodroid.ShowProvider;
 import com.unitedcoders.android.gpodroid.activity.AccountSettings;
 import com.unitedcoders.android.gpodroid.database.GpodDB;
 import com.unitedcoders.gpodder.GpodderAPI;
@@ -89,6 +92,30 @@ public class UpdateService extends Service {
 
         List<GpodderPodcast> pcl = podcast.getUpdates();
         gpdb.addPodcasts(pcl);
+//
+//        ShowProvider provider = new ShowProvider();
+//        Uri uri = Uri.parse("content://" + ShowProvider.PROVIDER + "/show");
+//
+//        for (int i = 0; i < pcl.size(); i++) {
+//            GpodderPodcast gpodderPodcast = pcl.get(i);
+//            ContentValues cv = new ContentValues();
+//            cv.put("show", gpodderPodcast.getTitle());
+//            cv.put("title", gpodderPodcast.getPodcast_title());
+//            cv.put("url", gpodderPodcast.getUrl());
+//
+//
+//            Uri result = getContentResolver().insert(uri, cv);
+//
+//            Log.d(GpodRoid.LOGTAG, "inserting into contentprovider  "+result.toString());
+//        }
+
+//        ContentValues cv = new ContentValues();
+//        cv.put("show", "asdf");
+//        cv.put("title", "asdf");
+
+
+//        provider.insert(uri, cv);
+
 
         handler.post(doUpdateDownloadList);
     }

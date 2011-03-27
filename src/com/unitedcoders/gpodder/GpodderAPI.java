@@ -81,6 +81,9 @@ public class GpodderAPI {
             urlStr = urlStr.replace("USERNAME", GpodRoid.prefs.getUsername());
             urlStr = urlStr.replace("DEVICE", GpodRoid.prefs.getDevice());
             url = new URL(urlStr);
+
+            Log.d(GpodRoid.LOGTAG, "trying to get updates "+url.toString());
+
             URLConnection conn = url.openConnection();
             conn.setRequestProperty(
                     "Authorization",

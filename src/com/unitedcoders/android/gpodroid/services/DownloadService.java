@@ -10,9 +10,11 @@ import android.os.IBinder;
 import android.util.Log;
 import android.widget.RemoteViews;
 import com.unitedcoders.android.gpodroid.Episode;
+import com.unitedcoders.android.gpodroid.GpodRoid;
 import com.unitedcoders.android.gpodroid.R;
 import com.unitedcoders.android.gpodroid.activity.PodcastManager;
 import com.unitedcoders.android.gpodroid.database.GpodDB;
+import com.unitedcoders.android.gpodroid.tools.Tools;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -23,7 +25,10 @@ import java.net.URL;
 import java.util.ArrayList;
 
 public class DownloadService extends Service {
-    private int podDownloadedSize, podTotalSize;
+
+    private final static int DOWNLOADSERVICE_NOTIFICATIONID = 42;
+
+    private int downloaded, totalDownloadSize;
     private Intent intent;
 
     public static ArrayList<Episode> downloadQueue = new ArrayList<Episode>();
@@ -59,83 +64,22 @@ public class DownloadService extends Service {
             while (downloadQueue.size() > 0 && (episode = downloadQueue.get(0)) != null) {
                 try {
                     String downloadUrl = episode.getUrl();
-                    Log.d("Gpodroid", "starting download " + downloadUrl);
-                    URL podcastURL = new URL(downloadUrl);
-                    HttpURLConnection urlConnection = (HttpURLConnection) podcastURL.openConnection();
-                    urlConnection.setRequestMethod("GET");
-                    urlConnection.setDoOutput(true);
 
-                    urlConnection.connect();
-
+                    File name = new File(downloadUrl);
+                    String fileName = name.getName().trim();
                     File SDCardRoot = Environment.getExternalStorageDirectory();
-                    new File(SDCardRoot + "/gpodder/").mkdir();
+                    String storageLocation =  SDCardRoot.getAbsolutePath()+"/gpodroid/";
 
-                    File name = new File(podcastURL.toString());
-                    String saveName = name.getName().trim();
-                    File file = new File("/sdcard/gpodder/", saveName);
-                    FileOutputStream fileOutput = new FileOutputStream(file);
-                    InputStream inputStream = urlConnection.getInputStream();
-                    podTotalSize = urlConnection.getContentLength();
-
-                    byte[] buffer = new byte[1024];
-                    int bufferLength = 0;
-                    podDownloadedSize = 0;
-
-                    // put download info in notification bar
-                    final Notification notification = new Notification(R.drawable.icon, "downloading podcast", System
-                            .currentTimeMillis());
-                    notification.flags = notification.flags | Notification.FLAG_ONGOING_EVENT;
-                    notification.contentView = new RemoteViews(getApplicationContext().getPackageName(),
-                            R.layout.download_progress);
-                    Intent intent = new Intent(getApplicationContext(), PodcastManager.class);
-                    final PendingIntent pendingIntent = PendingIntent
-                            .getActivity(getApplicationContext(), 0, intent, 0);
-
-                    notification.contentIntent = pendingIntent;
-
-                    notification.contentView.setImageViewResource(R.id.status_icon, R.drawable.ic_menu_save);
-                    notification.contentView.setTextViewText(R.id.status_text, episode.getTitle());
-
-                    notification.contentView.setProgressBar(R.id.status_progress, podTotalSize, podDownloadedSize,
-                            false);
-
-                    final NotificationManager notificationManager = (NotificationManager) getApplicationContext()
-                            .getSystemService(getApplicationContext().NOTIFICATION_SERVICE);
-
-                    notificationManager.notify(42, notification);
-
-                    int nextNotification = 0;
-                    // now, read through the input buffer and write the contents
-                    // to the file
-                    while ((bufferLength = inputStream.read(buffer)) > 0) {
-                        // add the data in the buffer to the file in the file
-                        // output stream (the file on the sd card
-                        fileOutput.write(buffer, 0, bufferLength);
-                        // add up the size so we know how much is downloaded
-                        podDownloadedSize += bufferLength;
-                        // this is where you would do something to report the progress
-                        // Log.d("gpodder", "progress " + podDownloadedSize);
-                        // System.out.println("progress" + podDownloadedSize);
-
-                        // update notification
-                        if (podDownloadedSize >= nextNotification) {
-                            notification.contentView.setProgressBar(R.id.status_progress, podTotalSize,
-                                    podDownloadedSize, false);
-                            notificationManager.notify(42, notification);
-                            nextNotification += podTotalSize / 10;
-                        }
-
-                    }
-
-                    notificationManager.cancel(42);
-                    fileOutput.close();
+                    download(downloadUrl, storageLocation, fileName, "downloading "+episode.getTitle());
 
                     GpodDB db = new GpodDB(getApplicationContext());
-                    episode.setFile(file.getAbsolutePath());
+                    episode.setFile(storageLocation+fileName);
                     episode.setDownloaded(1);
                     db.updateEpisode(episode);
 
-
+                    // get imageurl from url
+                    String imageLocation = Tools.getImageUrlFromFeed(getApplicationContext(), episode.getPodcast_url());
+                    download(imageLocation, storageLocation+"covers/", episode.getPodcast_title().trim(), "downloading cover");
 
 
                 } catch (IOException e) {
@@ -152,97 +96,88 @@ public class DownloadService extends Service {
 
     };
 
+    /**
+     *
+     * @param sourceLocation    location of the download in the web
+     * @param storageLocation   directory to store the data on sdcard
+     * @param fileName          name of the file after download
+     * @param displayText       what text to show in the notificationbar
+     * @throws IOException
+     */
+    private void download(String sourceLocation, String storageLocation, String fileName, String displayText) throws IOException {
+        Log.d("Gpodroid", "starting download " + sourceLocation);
+        URL podcastURL = new URL(sourceLocation);
+        HttpURLConnection urlConnection = (HttpURLConnection) podcastURL.openConnection();
+        urlConnection.setRequestMethod("GET");
+        urlConnection.setDoOutput(true);
+
+        urlConnection.connect();
+
+        File SDCardRoot = Environment.getExternalStorageDirectory();
+        new File(storageLocation).mkdir();
+
+//        File name = new File(podcastURL.toString());
+//        String saveName = name.getName().trim();
+        File file = new File(storageLocation, fileName);
+        FileOutputStream fileOutput = new FileOutputStream(file);
+        InputStream inputStream = urlConnection.getInputStream();
+        totalDownloadSize = urlConnection.getContentLength();
+
+        byte[] buffer = new byte[1024];
+        int bufferLength = 0;
+        downloaded = 0;
+
+        // put download info in notification bar
+        final Notification notification = new Notification(R.drawable.icon, "downloading podcast", System
+                .currentTimeMillis());
+        notification.flags = notification.flags | Notification.FLAG_ONGOING_EVENT;
+        notification.contentView = new RemoteViews(getApplicationContext().getPackageName(),
+                R.layout.download_progress);
+        Intent intent = new Intent(getApplicationContext(), PodcastManager.class);
+        final PendingIntent pendingIntent = PendingIntent
+                .getActivity(getApplicationContext(), 0, intent, 0);
+
+        notification.contentIntent = pendingIntent;
+
+        notification.contentView.setImageViewResource(R.id.status_icon, R.drawable.ic_menu_save);
+        notification.contentView.setTextViewText(R.id.status_text, displayText);
+
+        notification.contentView.setProgressBar(R.id.status_progress, totalDownloadSize, downloaded,
+                false);
+
+        final NotificationManager notificationManager = (NotificationManager) getApplicationContext()
+                .getSystemService(getApplicationContext().NOTIFICATION_SERVICE);
+
+        notificationManager.notify(DOWNLOADSERVICE_NOTIFICATIONID, notification);
+
+        int nextNotification = 0;
+        // now, read through the input buffer and write the contents
+        // to the file
+        while ((bufferLength = inputStream.read(buffer)) > 0) {
+            // add the data in the buffer to the file in the file
+            // output stream (the file on the sd card
+            fileOutput.write(buffer, 0, bufferLength);
+            // add up the size so we know how much is downloaded
+            downloaded += bufferLength;
+
+            // update notification
+            if (downloaded >= nextNotification) {
+                notification.contentView.setProgressBar(R.id.status_progress, totalDownloadSize,
+                        downloaded, false);
+                notificationManager.notify(DOWNLOADSERVICE_NOTIFICATIONID, notification);
+                nextNotification += totalDownloadSize / 5;
+            }
+
+        }
+
+        notificationManager.cancel(DOWNLOADSERVICE_NOTIFICATIONID);
+        fileOutput.close();
+
+        Log.d(GpodRoid.LOGTAG, "finished download " + sourceLocation + " in " + storageLocation + fileName);
+
+
+    }
+
 }
 
-// public void downloadPodcast(String podcast) {
-// try {
-//	
-// // Context context, PodcastListAdapter pcla
-// // URL podcastUrl = new URL(pcel.get(0).getTitle());
-// // URL podcastUrl = new URL("http://nicoheid.com/pc.mp3");
-// // List<PodcastElement> downloadList = pcla.getCheckedItems();
-// // URL podcastUrl = new URL(downloadList.get(0).getDownloadurl());
-//			
-// URL podcastURL = new URL(podcast);
-//	
-// HttpURLConnection urlConnection = (HttpURLConnection) podcastUrl.openConnection();
-// urlConnection.setRequestMethod("GET");
-// urlConnection.setDoOutput(true);
-//	
-// urlConnection.connect();
-//	
-// File SDCardRoot = Environment.getExternalStorageDirectory();
-// // --
-// new File("/sdcard/gpodder/").mkdir();
-//	
-// // --
-// File name = new File(downloadList.get(0).getDownloadurl());
-// String saveName = name.getName().trim();
-// File file = new File("/sdcard/gpodder/", saveName);
-// FileOutputStream fileOutput = new FileOutputStream(file);
-// InputStream inputStream = urlConnection.getInputStream();
-// podTotalSize = urlConnection.getContentLength();
-//	
-// byte[] buffer = new byte[1024];
-// int bufferLength = 0;
-// podDownloadedSize = 0;
-//	
-// // pd = new ProgressDialog(context);
-// // pd.setMessage("Downloading ...");
-// // pd.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-// // pd.setMax(podTotalSize);
-// // pd.setProgress(0);
-// // pd.show();
-// //
-// // Thread background = new Thread (new Runnable() {
-// //
-// // @Override
-// // public void run() {
-// // while(podDownloadedSize < podTotalSize){
-// //
-// // try {
-// // Thread.sleep(1000);
-// // progressHandler.sendMessage(progressHandler.obtainMessage());
-// // } catch (InterruptedException e) {
-// // // TODO Auto-generated catch block
-// // e.printStackTrace();
-// // }
-// //
-// // }
-// // pd.dismiss();
-// //
-// // }
-// // });
-// //
-// // background.start();
-//	
-// // now, read through the input buffer and write the contents
-// // to the file
-// while ((bufferLength = inputStream.read(buffer)) > 0) {
-// // add the data in the buffer to the file in the file
-// // output stream (the file on the sd card
-// fileOutput.write(buffer, 0, bufferLength);
-// // add up the size so we know how much is downloaded
-// podDownloadedSize += bufferLength;
-// // this is where you would do something to report the
-// // prgress, like this maybe
-// // updateProgress(downloadedSize, totalSize);
-// Log.d("gpodder", "progress " + podDownloadedSize);
-// System.out.println("progress" + podDownloadedSize);
-// // progDia.setProgress((podDownloadedSize*100)/podTotalSize);
-// // pd.setProgress(3);
-//	
-// }
-// // pd.dismiss();
-// fileOutput.close();
-//	
-// } catch (MalformedURLException e) {
-// // TODO Auto-generated catch block
-// e.printStackTrace();
-// } catch (IOException e) {
-// // TODO Auto-generated catch block
-// e.printStackTrace();
-// }
-//	
-// }
 

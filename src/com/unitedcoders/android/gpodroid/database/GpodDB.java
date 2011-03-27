@@ -16,7 +16,7 @@ public class GpodDB {
     private Context context;
     private SQLiteDatabase db;
     private GpodDBHelper dbHelper;
-    private static final String DATABASE_TABLE = "podcast";
+    public static final String DATABASE_TABLE = "podcast";
 
     public GpodDB(Context context) {
         this.context = context;
@@ -65,6 +65,7 @@ public class GpodDB {
             map.put("url", gpodderPodcast.getUrl());
             map.put("downloaded", 0);
             map.put("played", 0);
+            map.put("podcast_url", gpodderPodcast.getPodcast_url());
 
             long l = db.insert(DATABASE_TABLE, null, map);
             c.close();
@@ -91,7 +92,7 @@ public class GpodDB {
 
     public List<Episode> getEpisodes(String title) {
         open();
-        Cursor c = db.query(DATABASE_TABLE, new String[]{"show, title, downloaded, url, file"},
+        Cursor c = db.query(DATABASE_TABLE, new String[]{"show, title, downloaded, url, file, _id, podcast_url"},
                 "title=?", new String[]{title}, null, null, null);
 
         ArrayList<Episode> podcasts = new ArrayList<Episode>();
@@ -105,6 +106,8 @@ public class GpodDB {
                 pce.setDownloaded(c.getInt(2));
                 pce.setUrl(c.getString(3));
                 pce.setFile(c.getString(4));
+                pce.setId(c.getInt(5));
+                pce.setPodcast_url(c.getString(6));
 
                 podcasts.add(pce);
             }
