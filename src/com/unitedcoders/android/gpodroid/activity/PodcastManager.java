@@ -145,6 +145,7 @@ public class PodcastManager extends TabActivity implements OnClickListener {
                     Toast.makeText(getApplicationContext(), "starting podcast", Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(getApplicationContext(), Player.class);
                     Player.pce = episode;
+                    Player.switchPodcast = true;
                     startActivity(intent);
                 }
 

@@ -119,6 +119,32 @@ public class GpodDB {
 
     }
 
+    public Episode getEpisode(int id) {
+        open();
+        Cursor c = db.query(DATABASE_TABLE, new String[]{"show, title, downloaded, url, file, _id, podcast_url"},
+                "_id=?", new String[]{Integer.toString(id)}, null, null, null);
+
+        Episode pce = new Episode(new GpodderPodcast());
+        if (c.getCount() != 0) {
+
+            c.moveToFirst();
+
+            pce.setTitle(c.getString(0));
+            pce.setPodcast_title(c.getString(1));
+            pce.setDownloaded(c.getInt(2));
+            pce.setUrl(c.getString(3));
+            pce.setFile(c.getString(4));
+            pce.setId(c.getInt(5));
+            pce.setPodcast_url(c.getString(6));
+
+        }
+
+        c.close();
+        close();
+        return pce;
+
+    }
+
     public List<String> getPodcasts() {
         open();
         Cursor c = db.query(true, DATABASE_TABLE, new String[]{"title"}, null, null, null, null, null, null);
