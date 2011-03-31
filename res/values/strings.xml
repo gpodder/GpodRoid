@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:xliff="http://schemas.android.com/apk/res/android">
     <string name="hello">Hello World, GpodRoid!</string>
     <string name="app_name">GpodRoid</string>
+    <string translatable="false" name="durationformatshort">
+        <xliff:g id="format">%2$d:%5$02d</xliff:g>
+    </string>
+    <string translatable="false" name="durationformatlong">
+        <xliff:g id="format">%1$d:%3$02d:%5$02d</xliff:g>
+    </string>
 </resources>

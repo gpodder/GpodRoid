@@ -36,7 +36,7 @@ public class DownloadProgress extends Activity {
 
         notification.contentIntent = pendingIntent;
 
-        notification.contentView.setImageViewResource(R.id.status_icon, R.drawable.ic_menu_save);
+        notification.contentView.setImageViewResource(R.id.status_icon, android.R.drawable.ic_menu_save);
         notification.contentView.setTextViewText(R.id.status_text, "downloading podcast");
 
         notification.contentView.setProgressBar(R.id.status_progress, 100, progress, false);

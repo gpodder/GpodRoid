@@ -3,6 +3,7 @@ package com.unitedcoders.android.gpodroid.tools;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
+import com.unitedcoders.android.gpodroid.R;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -16,6 +17,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Formatter;
+import java.util.Locale;
 
 public class Tools {
 
@@ -91,6 +94,30 @@ public class Tools {
             System.out.println("Exc=" + e);
             return null;
         }
+    }
+
+
+    private static StringBuilder sFormatBuilder = new StringBuilder();
+    private static Formatter sFormatter = new Formatter(sFormatBuilder, Locale.getDefault());
+    private static final Object[] sTimeArgs = new Object[5];
+
+    public static String    makeTimeString(Context context, long secs) {
+        String durationformat = context.getString(
+                secs < 3600 ? R.string.durationformatshort : R.string.durationformatlong);
+
+        /* Provide multiple arguments so the format can be changed easily
+        * by modifying the xml.
+        */
+        sFormatBuilder.setLength(0);
+
+        final Object[] timeArgs = sTimeArgs;
+        timeArgs[0] = secs / 3600;
+        timeArgs[1] = secs / 60;
+        timeArgs[2] = (secs / 60) % 60;
+        timeArgs[3] = secs;
+        timeArgs[4] = secs % 60;
+
+        return sFormatter.format(durationformat, timeArgs).toString();
     }
 
 
