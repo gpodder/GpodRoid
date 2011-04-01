@@ -82,7 +82,7 @@ public class GpodderAPI {
             urlStr = urlStr.replace("DEVICE", GpodRoid.prefs.getDevice());
             url = new URL(urlStr);
 
-            Log.d(GpodRoid.LOGTAG, "trying to get updates "+url.toString());
+            Log.d(GpodRoid.LOGTAG, "API, downloading "+ urlStr);
 
             URLConnection conn = url.openConnection();
             conn.setRequestProperty(

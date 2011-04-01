@@ -11,6 +11,10 @@ import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.text.style.SubscriptSpan;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.*;
@@ -40,28 +44,19 @@ public class Player extends RoboActivity implements OnClickListener, SeekBar.OnS
     public static boolean switchPodcast;
 
     // podcast information
-    @InjectView(R.id.tv_podcast_title)
-    private TextView tvTitle;
-    @InjectView(R.id.tv_episode_name)
-    private TextView tvEpisode;
-    @InjectView(R.id.tv_total_time)
-    private TextView tvTotalTime;
-    @InjectView(R.id.tv_position_time)
-    private TextView tvPositionTime;
+    @InjectView(R.id.tv_podcast_title) private TextView tvTitle;
+    @InjectView(R.id.tv_episode_name) private TextView tvEpisode;
+    @InjectView(R.id.tv_total_time) private TextView tvTotalTime;
+    @InjectView(R.id.tv_position_time) private TextView tvPositionTime;
 
     // cover art
-    @InjectView(R.id.iv_cover)
-    private ImageView ivCover;
+    @InjectView(R.id.iv_cover) private ImageView ivCover;
 
     // buttons
-    @InjectView(R.id.btn_forward)
-    private ImageButton btnForward;
-    @InjectView(R.id.btn_backward)
-    private ImageButton btnBackward;
-    @InjectView(R.id.btn_play)
-    private ImageButton btnPlay;
-    @InjectView(R.id.bar_playback)
-    private SeekBar barProgress;
+    @InjectView(R.id.btn_forward) private ImageButton btnForward;
+    @InjectView(R.id.btn_backward) private ImageButton btnBackward;
+    @InjectView(R.id.btn_play) private ImageButton btnPlay;
+    @InjectView(R.id.bar_playback) private SeekBar barProgress;
 
 
     @Override
@@ -115,11 +110,19 @@ public class Player extends RoboActivity implements OnClickListener, SeekBar.OnS
         }
 
 
-        File SDCardRoot = Environment.getExternalStorageDirectory();
-        String storageLocation = SDCardRoot.getAbsolutePath() + "/gpodroid/covers";
-        Bitmap bm = BitmapFactory.decodeFile(storageLocation + "/" + pce.getPodcast_title().trim());
+        try {
+            File SDCardRoot = Environment.getExternalStorageDirectory();
+            String storageLocation = SDCardRoot.getAbsolutePath() + "/gpodroid/covers";
+            File cover = new File(storageLocation + "/" + pce.getPodcast_title().trim());
+            Bitmap bm;
+            if (cover.exists()) {
+                bm = BitmapFactory.decodeFile(storageLocation + "/" + pce.getPodcast_title().trim());
+                ivCover.setImageBitmap(bm);
+            }
+        } catch (Exception e) {
 
-        ivCover.setImageBitmap(bm);
+        }
+
 
         if (pce == null) {
             return;
@@ -277,6 +280,30 @@ public class Player extends RoboActivity implements OnClickListener, SeekBar.OnS
 
     //TODO release mediaplayer if its not in use for a while
     // workaround for http://code.google.com/p/android/issues/detail?id=4124
+
+
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.account:
+                Intent account = new Intent(getApplicationContext(), AccountSettings.class);
+                startActivity(account);
+                return true;
+            case R.id.subscriptions:
+                Intent subscriptions = new Intent(getApplicationContext(), Subscribe.class);
+                startActivity(subscriptions);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
 
 
 }

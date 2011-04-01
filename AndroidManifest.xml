@@ -16,6 +16,7 @@
 		<activity android:name=".activity.AccountSettings" />
         <activity android:name=".activity.SelectDevice" />
         <activity android:name=".activity.PodcastManager" />
+        <activity android:name=".activity.Subscribe" />
 
         <service android:name=".services.DownloadService" />
         <service android:name=".services.UpdateService" />

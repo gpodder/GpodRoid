@@ -66,6 +66,7 @@ public class GpodDB {
             map.put("downloaded", 0);
             map.put("played", 0);
             map.put("podcast_url", gpodderPodcast.getPodcast_url());
+            map.put("released", gpodderPodcast.getReleased());
 
             long l = db.insert(DATABASE_TABLE, null, map);
             c.close();
@@ -80,7 +81,7 @@ public class GpodDB {
     public void updateEpisode(Episode episode) {
         open();
         ContentValues values = new ContentValues();
-        values.put("downloaded", 1);
+        values.put("downloaded", episode.getDownloaded());
         values.put("file", episode.getFile());
 
         db.update(DATABASE_TABLE, values, "show =? and title=?",
@@ -165,4 +166,38 @@ public class GpodDB {
 
     }
 
+    public List<Episode> getDownloads() {
+        open();
+        Cursor c = db.query(DATABASE_TABLE, new String[]{"show, title, downloaded, url, file, _id, podcast_url"},
+                "downloaded=?", new String[]{"0"}, null, null, "released desc", "20");
+
+        ArrayList<Episode> podcasts = new ArrayList<Episode>();
+
+        if (c.getCount() != 0) {
+            while (!c.isLast()) {
+                c.moveToNext();
+                Episode pce = new Episode(new GpodderPodcast());
+                pce.setTitle(c.getString(0));
+                pce.setPodcast_title(c.getString(1));
+                pce.setDownloaded(c.getInt(2));
+                pce.setUrl(c.getString(3));
+                pce.setFile(c.getString(4));
+                pce.setId(c.getInt(5));
+                pce.setPodcast_url(c.getString(6));
+
+                podcasts.add(pce);
+            }
+        }
+
+        c.close();
+        close();
+        return podcasts;
+    }
+
+    public void wipeClean() {
+        open();
+        db.delete(DATABASE_TABLE, "_id > ?" ,new String[]{"-1"});
+        close();
+
+    }
 }

@@ -8,10 +8,10 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class GpodDBHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "gpodroid.db";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
 
     // Database creation sql statement
-    private static final String DATABASE_CREATE_PODCASTINFO = "CREATE TABLE podcast (_ID INTEGER PRIMARY KEY, file TEXT, title TEXT, show TEXT, downloaded INTEGER, played INTEGER, url TEXT, podcast_url TEXT)";
+    private static final String DATABASE_CREATE_PODCASTINFO = "CREATE TABLE podcast (_ID INTEGER PRIMARY KEY, file TEXT, title TEXT, show TEXT, downloaded INTEGER, played INTEGER, url TEXT, podcast_url TEXT, released TEXT)";
 
     public GpodDBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);

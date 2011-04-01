@@ -5,7 +5,9 @@ import java.util.ArrayList;
 import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ArrayAdapter;
@@ -13,8 +15,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 
+import com.unitedcoders.android.gpodroid.GpodRoid;
 import com.unitedcoders.android.gpodroid.Preferences;
 import com.unitedcoders.android.gpodroid.R;
+import com.unitedcoders.android.gpodroid.database.GpodDB;
+import com.unitedcoders.android.gpodroid.services.UpdateService;
 import com.unitedcoders.gpodder.GpodderAPI;
 
 /**
@@ -49,7 +54,11 @@ public class SelectDevice extends ListActivity implements OnClickListener {
         // super.onListItemClick(l, v, position, id);
 
         String device = (String) l.getItemAtPosition(position);
+        Log.d(GpodRoid.LOGTAG, "saving device " + device);
         saveDevice(device);
+        GpodDB db = new GpodDB(getApplicationContext());
+        db.wipeClean();
+        startService(new Intent(getApplicationContext(), UpdateService.class));
         finish();
     }
 
