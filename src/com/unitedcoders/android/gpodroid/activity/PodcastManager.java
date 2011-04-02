@@ -1,31 +1,24 @@
 package com.unitedcoders.android.gpodroid.activity;
 
-import java.io.File;
-import java.util.List;
-
 import android.app.AlertDialog;
-import android.app.TabActivity;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
+import android.content.*;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.*;
 import android.widget.AdapterView.OnItemClickListener;
-
-import com.google.inject.Inject;
 import com.unitedcoders.android.gpodroid.*;
 import com.unitedcoders.android.gpodroid.database.GpodDB;
 import com.unitedcoders.android.gpodroid.services.DownloadService;
-import com.unitedcoders.gpodder.GpodderAPI;
-import com.unitedcoders.gpodder.GpodderPodcast;
-import com.unitedcoders.gpodder.GpodderUpdates;
 import roboguice.activity.RoboTabActivity;
 import roboguice.inject.InjectView;
+
+import java.io.File;
+import java.util.List;
 
 public class PodcastManager extends RoboTabActivity implements OnClickListener {
 
@@ -34,16 +27,12 @@ public class PodcastManager extends RoboTabActivity implements OnClickListener {
     private TabHost mTabHost;
 
     // podcasts in archive
-    @InjectView(R.id.lv_shows)
-    private ListView lvShows;
-    @InjectView(R.id.lv_podcasts)
-    private ListView lvPodcasts;
-    @InjectView(R.id.lv_downloads)
-    private ListView lvDownloads;
+    @InjectView(R.id.lv_shows) private ListView lvShows;
+    @InjectView(R.id.lv_podcasts) private ListView lvPodcasts;
+    @InjectView(R.id.lv_downloads) private ListView lvDownloads;
 //    private ListView lvDownloads;
 
-    @InjectView(R.id.tabmgr_sdcard)
-    private ViewFlipper sdcardFlipper;
+    @InjectView(R.id.tabmgr_sdcard) private ViewFlipper sdcardFlipper;
     private PodcastListAdapter podcastAdapter;
     private PodcastListAdapter downloadAdapter;
     private ArrayAdapter showAdapter;
@@ -52,9 +41,17 @@ public class PodcastManager extends RoboTabActivity implements OnClickListener {
     private PodcastListAdapter pcla;
     private Preferences pref;
 
+    private static String show = "";
+
     private boolean podcastSubmenu = false;
 
     public static boolean archiveDirty = false;
+    private static IntentFilter filter = new IntentFilter();
+
+
+    static {
+        filter.addAction(GpodRoid.BROADCAST_SUBSCRIPTION_CHANGE);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,19 +70,27 @@ public class PodcastManager extends RoboTabActivity implements OnClickListener {
 
         mTabHost.setCurrentTab(0);
 
-        showShows();
-        showDownloads();
+//        showShows();
+//        showDownloads();
+
 
     }
 
     @Override
-    public void onClick(View v) {
-        // TODO Auto-generated method stub
+    public void onResume() {
+        context.registerReceiver(subscriptionChangeReceiver, filter);
+        showShows(false);
+        showDownloads();
 
-//        if (v == sdcardFlipper || v == lvShows) {
-//            sdcardFlipper.showNext();
-//        }
+        super.onResume();
 
+
+    }
+
+    @Override
+    public void onPause() {
+        context.unregisterReceiver(subscriptionChangeReceiver);
+        super.onPause();
     }
 
     @Override
@@ -105,16 +110,18 @@ public class PodcastManager extends RoboTabActivity implements OnClickListener {
     }
 
 
-    private void showEpisodes(String show) {
-        podcastSubmenu = true;
-//
+    private void showEpisodes(String show, boolean flipView) {
 
         GpodDB db = new GpodDB(getApplicationContext());
         List<Episode> shows = db.getEpisodes(show);
 
         podcastAdapter = new PodcastListAdapter(getApplicationContext(), shows);
         lvPodcasts.setAdapter(podcastAdapter);
-        sdcardFlipper.showNext();
+
+        if (flipView) {
+            podcastSubmenu = true;
+            sdcardFlipper.showNext();
+        }
 
         // download or play depending on if we have the show
         lvPodcasts.setOnItemClickListener(new OnItemClickListener() {
@@ -173,9 +180,11 @@ public class PodcastManager extends RoboTabActivity implements OnClickListener {
 
     }
 
-    private void showShows() {
-        podcastSubmenu = false;
+    private void showShows(boolean flipView) {
 
+        if (flipView) {
+            podcastSubmenu = false;
+        }
 
         GpodDB db = new GpodDB(getApplicationContext());
         List<String> shows = db.getPodcasts();
@@ -189,8 +198,9 @@ public class PodcastManager extends RoboTabActivity implements OnClickListener {
 
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String show = (String) parent.getItemAtPosition(position);
-                showEpisodes(show);
+                show = (String) parent.getItemAtPosition(position);
+
+                showEpisodes(show, true);
 
             }
         });
@@ -202,8 +212,8 @@ public class PodcastManager extends RoboTabActivity implements OnClickListener {
 
         GpodDB db = new GpodDB(getApplicationContext());
         List<Episode> shows = db.getDownloads();
-        podcastAdapter = new PodcastListAdapter(getApplicationContext(), shows);
-        lvDownloads.setAdapter(podcastAdapter);
+        downloadAdapter = new PodcastListAdapter(getApplicationContext(), shows);
+        lvDownloads.setAdapter(downloadAdapter);
 
         lvDownloads.setOnItemClickListener(new OnItemClickListener() {
             @Override
@@ -244,5 +254,25 @@ public class PodcastManager extends RoboTabActivity implements OnClickListener {
         });
         alert.show();
     }
+
+    @Override
+    public void onClick(View view) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    private BroadcastReceiver subscriptionChangeReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d(GpodRoid.LOGTAG, "received Broadcast, refreshing views");
+            showDownloads();
+            showShows(false);
+            showEpisodes(show, false);
+            podcastAdapter.notifyDataSetChanged();
+//            downloadAdapter.notifyDataSetChanged();
+            showAdapter.notifyDataSetChanged();
+
+        }
+    };
+
 
 }

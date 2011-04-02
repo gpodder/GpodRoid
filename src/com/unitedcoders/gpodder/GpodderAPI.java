@@ -66,9 +66,9 @@ public class GpodderAPI {
 
     public static GpodderUpdates getDownloadList() {
 
-        if (downloadListResponse != null) {
-            return downloadListResponse;
-        }
+//        if (downloadListResponse != null) {
+//            return downloadListResponse;
+//        }
 
         // get preferences
 
@@ -244,6 +244,7 @@ public class GpodderAPI {
             con.setRequestProperty("Authorization",
                     "Basic " + Base64.encodeBytes((pref.getUsername() + ":" + pref.getPassword()).getBytes()));
 
+            Log.d(GpodRoid.LOGTAG, "sending subscription: "+urlStr +" with body " +device.toString());
             OutputStreamWriter out = new OutputStreamWriter(con.getOutputStream());
             out.write(device.toString());
             out.close();

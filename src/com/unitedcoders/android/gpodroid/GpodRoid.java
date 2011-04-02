@@ -15,8 +15,10 @@ import java.util.List;
  */
 public class GpodRoid extends RoboApplication {
     
-    public static String LOGTAG = "GpodRoid";
+    public static String LOGTAG = "GPR";
     public static Preferences prefs;
+
+    public static final String BROADCAST_SUBSCRIPTION_CHANGE = "test321";
 
 
     protected void addApplicationModules(List<Module> modules){

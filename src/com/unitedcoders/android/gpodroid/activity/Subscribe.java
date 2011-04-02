@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import android.app.ListActivity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -14,6 +15,8 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 
+import com.unitedcoders.android.gpodroid.GpodRoid;
+import com.unitedcoders.android.gpodroid.services.UpdateService;
 import com.unitedcoders.gpodder.GpodderAPI;
 
 public class Subscribe extends ListActivity {
@@ -38,18 +41,26 @@ public class Subscribe extends ListActivity {
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
         // TODO Auto-generated method stub
         super.onCreateContextMenu(menu, v, menuInfo);
-        AdapterView.AdapterContextMenuInfo info = (AdapterContextMenuInfo) menuInfo;
-        String itemAtPosition = (String) getListView().getItemAtPosition(info.position);
-        Log.d("GPR", "subscribing to " + top25hm.get(itemAtPosition));
-        new GpodderAPI().addSubcription(getApplicationContext(), top25hm.get(itemAtPosition));
         menu.add("subscribe");
 
     }
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-        // TODO Auto-generated method stub
-        // Log.d("GPR", "selected "+item.getTitle().toString());
+
+        AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
+        final String feed = (String) getListView().getItemAtPosition(info.position);
+        Log.d(GpodRoid.LOGTAG, "subscribing to " + top25hm.get(feed));
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                new GpodderAPI().addSubcription(getApplicationContext(), top25hm.get(feed));
+                startService(new Intent(getApplicationContext(), UpdateService.class));
+            }
+        }).start();
+
+
         return super.onContextItemSelected(item);
 
     }

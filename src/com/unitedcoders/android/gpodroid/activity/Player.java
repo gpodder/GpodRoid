@@ -31,7 +31,7 @@ import roboguice.inject.InjectView;
  *
  * @author Nico Heid
  */
-public class Player extends RoboActivity implements OnClickListener, SeekBar.OnSeekBarChangeListener {
+public class Player extends RoboActivityDefaultMenu implements OnClickListener, SeekBar.OnSeekBarChangeListener {
 
     final Handler handler = new Handler();
     private static int playbackPosition;
@@ -84,9 +84,7 @@ public class Player extends RoboActivity implements OnClickListener, SeekBar.OnS
         btnBackward.setOnClickListener(this);
         btnPlay.setOnClickListener(this);
 
-        if (pce == null) {
-            openPodcastManager(null);
-        } else {
+        if (pce != null) {
             play();
         }
     }
@@ -96,8 +94,6 @@ public class Player extends RoboActivity implements OnClickListener, SeekBar.OnS
     protected void onDestroy() {
 
         savePlaybackState();
-        mp.release();
-        mp = null;
         super.onDestroy();
 
     }
@@ -282,28 +278,6 @@ public class Player extends RoboActivity implements OnClickListener, SeekBar.OnS
     // workaround for http://code.google.com/p/android/issues/detail?id=4124
 
 
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle item selection
-        switch (item.getItemId()) {
-            case R.id.account:
-                Intent account = new Intent(getApplicationContext(), AccountSettings.class);
-                startActivity(account);
-                return true;
-            case R.id.subscriptions:
-                Intent subscriptions = new Intent(getApplicationContext(), Subscribe.class);
-                startActivity(subscriptions);
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
 
 
 }

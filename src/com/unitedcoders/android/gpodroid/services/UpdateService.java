@@ -69,7 +69,6 @@ public class UpdateService extends Service {
 
     private Runnable doUpdateDownloadList = new Runnable() {
         public void run() {
-//            lvDownloads.setAdapter(pcla);
 
         }
     };
@@ -92,32 +91,15 @@ public class UpdateService extends Service {
 
         List<GpodderPodcast> pcl = podcast.getUpdates();
         gpdb.addPodcasts(pcl);
-//
-//        ShowProvider provider = new ShowProvider();
-//        Uri uri = Uri.parse("content://" + ShowProvider.PROVIDER + "/show");
-//
-//        for (int i = 0; i < pcl.size(); i++) {
-//            GpodderPodcast gpodderPodcast = pcl.get(i);
-//            ContentValues cv = new ContentValues();
-//            cv.put("show", gpodderPodcast.getTitle());
-//            cv.put("title", gpodderPodcast.getPodcast_title());
-//            cv.put("url", gpodderPodcast.getUrl());
-//
-//
-//            Uri result = getContentResolver().insert(uri, cv);
-//
-//            Log.d(GpodRoid.LOGTAG, "inserting into contentprovider  "+result.toString());
-//        }
-
-//        ContentValues cv = new ContentValues();
-//        cv.put("show", "asdf");
-//        cv.put("title", "asdf");
-
-
-//        provider.insert(uri, cv);
 
 
         handler.post(doUpdateDownloadList);
+
+        // notify views of new content
+        Log.d(GpodRoid.LOGTAG, "UpdateService broadcasting changes");
+        Intent subscriptionChanged = new Intent();
+        subscriptionChanged.setAction(GpodRoid.BROADCAST_SUBSCRIPTION_CHANGE);
+        sendBroadcast(subscriptionChanged);
     }
 
 
