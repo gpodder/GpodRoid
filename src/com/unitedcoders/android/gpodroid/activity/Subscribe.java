@@ -1,39 +1,46 @@
 package com.unitedcoders.android.gpodroid.activity;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-
-import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ContextMenu.ContextMenuInfo;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.AdapterView.AdapterContextMenuInfo;
-
+import android.widget.ArrayAdapter;
+import android.widget.EditText;
+import android.widget.ImageButton;
 import com.unitedcoders.android.gpodroid.GpodRoid;
+import com.unitedcoders.android.gpodroid.R;
 import com.unitedcoders.android.gpodroid.services.UpdateService;
 import com.unitedcoders.gpodder.GpodderAPI;
+import roboguice.activity.RoboListActivity;
+import roboguice.inject.InjectView;
 
-public class Subscribe extends ListActivity {
+import java.util.ArrayList;
+import java.util.HashMap;
+
+public class Subscribe extends RoboListActivity implements View.OnClickListener {
 
     String subscribeTo;
     ArrayList<String> top25;
     HashMap<String, String> top25hm;
 
+    @InjectView(R.id.btn_podcast_search) ImageButton btnPodcastSearch;
+    @InjectView(R.id.et_podcast_search) EditText etPodcastSearch;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        // TODO Auto-generated method stub
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.subscribe);
 
         top25hm = new GpodderAPI().getTopSubscriptions(getApplicationContext());
         top25 = new ArrayList<String>(top25hm.keySet());
         this.setListAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, top25));
         registerForContextMenu(getListView());
+
+        btnPodcastSearch.setOnClickListener(this);
 
     }
 
@@ -65,4 +72,15 @@ public class Subscribe extends ListActivity {
 
     }
 
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.btn_podcast_search:
+                String search = etPodcastSearch.getText().toString();
+                top25hm = GpodderAPI.searchFeeds("search");
+                top25 = new ArrayList<String>(top25hm.keySet());
+                this.setListAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, top25));
+                break;
+        }
+    }
 }

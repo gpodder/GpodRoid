@@ -56,7 +56,6 @@ public class PodcastManager extends RoboTabActivity implements OnClickListener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         this.context = getApplicationContext();
-        // TODO Auto-generated method stub
         super.onCreate(savedInstanceState);
         setContentView(R.layout.podcast_manager);
 

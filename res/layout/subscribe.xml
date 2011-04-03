@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+    <TableLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:stretchColumns="0">
+        <TableRow>
+            <EditText android:id="@+id/et_podcast_search" android:layout_width="fill_parent"
+                      android:layout_height="wrap_content" android:layout_weight="1"
+                      android:layout_gravity="center_vertical"/>
+            <ImageButton android:id="@+id/btn_podcast_search" android:src="@drawable/android:ic_menu_search"
+                         android:layout_width="60dip" android:layout_height="wrap_content"
+                         android:layout_gravity="center_vertical"/>
+        </TableRow>
+        <TableRow>
+            <ListView android:id="@android:id/list" android:layout_width="fill_parent"
+                      android:layout_height="fill_parent"/>
+        </TableRow>
+    </TableLayout>
+
+
+</LinearLayout>

@@ -30,9 +30,8 @@ import com.unitedcoders.android.gpodroid.Preferences;
 
 /**
  * The calls against gpodder.net API
- * 
+ *
  * @author Nico Heid
- * 
  */
 public class GpodderAPI {
 
@@ -82,14 +81,14 @@ public class GpodderAPI {
             urlStr = urlStr.replace("DEVICE", GpodRoid.prefs.getDevice());
             url = new URL(urlStr);
 
-            Log.d(GpodRoid.LOGTAG, "API, downloading "+ urlStr);
+            Log.d(GpodRoid.LOGTAG, "API, downloading " + urlStr);
 
             URLConnection conn = url.openConnection();
             conn.setRequestProperty(
                     "Authorization",
                     "Basic "
                             + Base64.encodeBytes((GpodRoid.prefs.getUsername() + ":" + GpodRoid.prefs.getPassword())
-                                    .getBytes()));
+                            .getBytes()));
             // + BasicAuth.encode(username, password));
             GpodderAPI api = new GpodderAPI();
             InputStream is = conn.getInputStream();
@@ -190,20 +189,20 @@ public class GpodderAPI {
     public HashMap<String, String> getTopSubscriptions(Context context) {
         ObjectMapper mapper = new ObjectMapper();
 
-        Preferences pref = Preferences.getPreferences(context);
+//        Preferences pref = Preferences.getPreferences(context);
 
         HashMap<String, String> subscriptions = new HashMap<String, String>();
         // ArrayList<String> gpodderDevices = new ArrayList<String>();
 
         String urlStr = "http://gpodder.net/toplist/25.json";
-        urlStr = urlStr.replace("USERNAME", pref.getUsername());
+//        urlStr = urlStr.replace("USERNAME", pref.getUsername());
         URL url;
         try {
             url = new URL(urlStr);
 
             URLConnection conn = url.openConnection();
-            conn.setRequestProperty("Authorization",
-                    "Basic " + Base64.encodeBytes((pref.getUsername() + ":" + pref.getPassword()).getBytes()));
+//            conn.setRequestProperty("Authorization",
+//                    "Basic " + Base64.encodeBytes((pref.getUsername() + ":" + pref.getPassword()).getBytes()));
 
             String response = IOUtils.toString(conn.getInputStream());
             JSONArray top25 = new JSONArray(response);
@@ -227,6 +226,41 @@ public class GpodderAPI {
         return subscriptions;
     }
 
+    public static HashMap<String, String> searchFeeds(String searchTerm) {
+        HashMap<String, String> subscriptions = new HashMap<String, String>();
+        String urlStr = "http://gpodder.net/search.json?q=SEARCHTERM";
+        urlStr = urlStr.replace("SEARCHTERM", searchTerm);
+        URL url;
+        try {
+            url = new URL(urlStr);
+
+            URLConnection conn = url.openConnection();
+//            conn.setRequestProperty("Authorization",
+//                    "Basic " + Base64.encodeBytes((pref.getUsername() + ":" + pref.getPassword()).getBytes()));
+
+            String response = IOUtils.toString(conn.getInputStream());
+            JSONArray top25 = new JSONArray(response);
+            for (int i = 0; i < top25.length(); i++) {
+                String title = top25.getJSONObject(i).getString("title");
+                String subUrl = top25.getJSONObject(i).getString("url");
+                subscriptions.put(title, subUrl);
+
+            }
+        } catch (MalformedURLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (JSONException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        return subscriptions;
+
+    }
+
     public void addSubcription(Context context, String url) {
         String urlStr = "http://gpodder.net/api/1/subscriptions/USERNAME/DEVICE.json";
         JSONObject device = new JSONObject();
@@ -244,7 +278,7 @@ public class GpodderAPI {
             con.setRequestProperty("Authorization",
                     "Basic " + Base64.encodeBytes((pref.getUsername() + ":" + pref.getPassword()).getBytes()));
 
-            Log.d(GpodRoid.LOGTAG, "sending subscription: "+urlStr +" with body " +device.toString());
+            Log.d(GpodRoid.LOGTAG, "sending subscription: " + urlStr + " with body " + device.toString());
             OutputStreamWriter out = new OutputStreamWriter(con.getOutputStream());
             out.write(device.toString());
             out.close();
@@ -269,4 +303,6 @@ public class GpodderAPI {
             e.printStackTrace();
         }
     }
+
+
 }
