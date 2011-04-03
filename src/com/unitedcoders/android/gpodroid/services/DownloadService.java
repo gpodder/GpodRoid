@@ -68,25 +68,27 @@ public class DownloadService extends Service {
                     File name = new File(downloadUrl);
                     String fileName = name.getName().trim();
                     File SDCardRoot = Environment.getExternalStorageDirectory();
-                    String storageLocation =  SDCardRoot.getAbsolutePath()+"/gpodroid/";
+                    String storageLocation = SDCardRoot.getAbsolutePath() + "/gpodroid/";
 
-                    download(downloadUrl, storageLocation, fileName, "downloading "+episode.getTitle());
+                    download(downloadUrl, storageLocation, fileName, "downloading " + episode.getTitle());
 
                     GpodDB db = new GpodDB(getApplicationContext());
-                    episode.setFile(storageLocation+fileName);
+                    episode.setFile(storageLocation + fileName);
                     episode.setDownloaded(1);
                     db.updateEpisode(episode);
 
                     // get imageurl from url
                     String imageLocation = Tools.getImageUrlFromFeed(getApplicationContext(), episode.getPodcast_url());
-                    download(imageLocation, storageLocation+"covers/", episode.getPodcast_title().trim(), "downloading cover");
+                    download(imageLocation, storageLocation + "covers/", episode.getPodcast_title().trim(), "downloading cover");
 
 
                 } catch (IOException e) {
                     Log.e("Gpodroid", "error when downloading " + episode.getPodcast_url(), e);
 
                 } finally {
-                    downloadQueue.remove(0);
+                    if (downloadQueue.size() >= 1) {
+                        downloadQueue.remove(0);
+                    }
                 }
 
                 // Toast.makeText(this, "download ended", Toast.LENGTH_LONG);
@@ -97,11 +99,10 @@ public class DownloadService extends Service {
     };
 
     /**
-     *
-     * @param sourceLocation    location of the download in the web
-     * @param storageLocation   directory to store the data on sdcard
-     * @param fileName          name of the file after download
-     * @param displayText       what text to show in the notificationbar
+     * @param sourceLocation  location of the download in the web
+     * @param storageLocation directory to store the data on sdcard
+     * @param fileName        name of the file after download
+     * @param displayText     what text to show in the notificationbar
      * @throws IOException
      */
     private void download(String sourceLocation, String storageLocation, String fileName, String displayText) throws IOException {

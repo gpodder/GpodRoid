@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.text.style.SubscriptSpan;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -107,6 +108,7 @@ public class Player extends RoboActivityDefaultMenu implements OnClickListener, 
 
 
         try {
+            ivCover.setImageResource(R.drawable.cd);
             File SDCardRoot = Environment.getExternalStorageDirectory();
             String storageLocation = SDCardRoot.getAbsolutePath() + "/gpodroid/covers";
             File cover = new File(storageLocation + "/" + pce.getPodcast_title().trim());
@@ -116,6 +118,8 @@ public class Player extends RoboActivityDefaultMenu implements OnClickListener, 
                 ivCover.setImageBitmap(bm);
             }
         } catch (Exception e) {
+            Log.d(GpodRoid.LOGTAG, "cannot set cover", e);
+            ivCover.setImageResource(R.drawable.cd);
 
         }
 
