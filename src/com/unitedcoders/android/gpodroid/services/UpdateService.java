@@ -80,7 +80,7 @@ public class UpdateService extends Service {
     };
 
     private void backgroundPodcastInfoFetcher() {
-        GpodderUpdates podcast = GpodderAPI.getDownloadList();
+        GpodderUpdates podcast = new GpodderAPI(getApplicationContext()).getDownloadList();
 
         GpodDB gpdb = new GpodDB(getApplicationContext());
 

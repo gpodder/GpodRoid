@@ -155,6 +155,9 @@ public class PodcastManager extends RoboTabActivity implements OnClickListener {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         Episode episode = (Episode) av.getItemAtPosition(pos);
+                        if(episode.getDownloaded()!=1){
+                            return;
+                        }
                         File f = new File(episode.getFile());
                         f.delete();
                         episode.setDownloaded(0);

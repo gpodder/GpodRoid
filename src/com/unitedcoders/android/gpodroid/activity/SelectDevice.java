@@ -40,7 +40,7 @@ public class SelectDevice extends ListActivity implements OnClickListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.select_device);
 
-        devices = new GpodderAPI().getDevices(getApplicationContext());
+        devices = new GpodderAPI(getApplicationContext()).getDevices();
         setListAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, devices));
 
         btnCustomName = (Button) findViewById(R.id.btn_customname);
@@ -79,8 +79,8 @@ public class SelectDevice extends ListActivity implements OnClickListener {
 
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                GpodderAPI.createDevice(getApplicationContext(), customName.getText().toString());
-                devices = new GpodderAPI().getDevices(getApplicationContext());
+                new GpodderAPI(getApplicationContext()).createDevice(getApplicationContext(), customName.getText().toString());
+                devices = new GpodderAPI(getApplicationContext()).getDevices();
                 setListAdapter(new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1,
                         devices));
 

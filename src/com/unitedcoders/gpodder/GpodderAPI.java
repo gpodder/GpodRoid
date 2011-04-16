@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import org.apache.commons.io.IOUtils;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JsonMappingException;
@@ -42,7 +44,10 @@ public class GpodderAPI {
 
     static GpodderUpdates downloadListResponse = null;
 
-    public GpodderAPI() {
+    Context context;
+
+    public GpodderAPI(Context context) {
+        this.context = context;
     }
 
     public GpodderUpdates parseResponse(InputStream inputStream) {
@@ -63,13 +68,7 @@ public class GpodderAPI {
 
     }
 
-    public static GpodderUpdates getDownloadList() {
-
-//        if (downloadListResponse != null) {
-//            return downloadListResponse;
-//        }
-
-        // get preferences
+    public GpodderUpdates getDownloadList() {
 
         URL url;
         // try to get the updates
@@ -83,16 +82,9 @@ public class GpodderAPI {
 
             Log.d(GpodRoid.LOGTAG, "API, downloading " + urlStr);
 
-            URLConnection conn = url.openConnection();
-            conn.setRequestProperty(
-                    "Authorization",
-                    "Basic "
-                            + Base64.encodeBytes((GpodRoid.prefs.getUsername() + ":" + GpodRoid.prefs.getPassword())
-                            .getBytes()));
-            // + BasicAuth.encode(username, password));
-            GpodderAPI api = new GpodderAPI();
+            URLConnection conn = createUrlConnection(urlStr, true);
             InputStream is = conn.getInputStream();
-            downloadListResponse = api.parseResponse(is);
+            downloadListResponse = parseResponse(is);
             is.close();
 
         } catch (MalformedURLException e) {
@@ -102,15 +94,11 @@ public class GpodderAPI {
         } catch (Exception e) {
             Log.e(GpodRoid.LOGTAG, "getDownloadList", e);
         }
-
-        //experimental, fill sql
-
-
         return downloadListResponse;
 
     }
 
-    public static void createDevice(Context context, String deviceName) {
+    public void createDevice(Context context, String deviceName) {
         String urlStr = String
                 .format("http://gpodder.net/api/2/devices/%s/gpodroid.json", GpodRoid.prefs.getUsername());
         JSONObject device = new JSONObject();
@@ -119,12 +107,8 @@ public class GpodderAPI {
             device.put("caption", deviceName);
             device.put("id", deviceName);
             device.put("type", "mobile");
-            URLConnection con = new URL(urlStr).openConnection();
+            URLConnection con = createUrlConnection(urlStr, true);
             con.setDoOutput(true);
-            Preferences pref = Preferences.getPreferences(context);
-            con.setRequestProperty("Authorization",
-                    "Basic " + Base64.encodeBytes((pref.getUsername() + ":" + pref.getPassword()).getBytes()));
-
             OutputStreamWriter out = new OutputStreamWriter(con.getOutputStream());
             out.write(device.toString());
             out.close();
@@ -148,23 +132,13 @@ public class GpodderAPI {
 
     }
 
-    public ArrayList<String> getDevices(Context context) {
-
-        // ObjectMapper mapper = new ObjectMapper();
-
-        Preferences pref = Preferences.getPreferences(context);
-
+    public ArrayList<String> getDevices() {
         ArrayList<String> gpodderDevices = new ArrayList<String>();
 
         String urlStr = "http://gpodder.net/api/2/devices/USERNAME.json";
-        urlStr = urlStr.replace("USERNAME", pref.getUsername());
-        URL url;
+        urlStr = urlStr.replace("USERNAME", GpodRoid.prefs.getUsername());
         try {
-            url = new URL(urlStr);
-
-            URLConnection conn = url.openConnection();
-            conn.setRequestProperty("Authorization",
-                    "Basic " + Base64.encodeBytes((pref.getUsername() + ":" + pref.getPassword()).getBytes()));
+            URLConnection conn = createUrlConnection(urlStr, true);
 
             String response = IOUtils.toString(conn.getInputStream());
             JSONArray devices = new JSONArray(response);
@@ -189,20 +163,14 @@ public class GpodderAPI {
     public HashMap<String, String> getTopSubscriptions(Context context) {
         ObjectMapper mapper = new ObjectMapper();
 
-//        Preferences pref = Preferences.getPreferences(context);
-
         HashMap<String, String> subscriptions = new HashMap<String, String>();
-        // ArrayList<String> gpodderDevices = new ArrayList<String>();
 
         String urlStr = "http://gpodder.net/toplist/25.json";
-//        urlStr = urlStr.replace("USERNAME", pref.getUsername());
         URL url;
         try {
             url = new URL(urlStr);
 
-            URLConnection conn = url.openConnection();
-//            conn.setRequestProperty("Authorization",
-//                    "Basic " + Base64.encodeBytes((pref.getUsername() + ":" + pref.getPassword()).getBytes()));
+            URLConnection conn = createUrlConnection(urlStr, false);
 
             String response = IOUtils.toString(conn.getInputStream());
             JSONArray top25 = new JSONArray(response);
@@ -226,18 +194,14 @@ public class GpodderAPI {
         return subscriptions;
     }
 
-    public static HashMap<String, String> searchFeeds(String searchTerm) {
+    public HashMap<String, String> searchFeeds(String searchTerm) {
         HashMap<String, String> subscriptions = new HashMap<String, String>();
         String urlStr = "http://gpodder.net/search.json?q=SEARCHTERM";
         urlStr = urlStr.replace("SEARCHTERM", searchTerm);
         URL url;
         try {
             url = new URL(urlStr);
-
-            URLConnection conn = url.openConnection();
-//            conn.setRequestProperty("Authorization",
-//                    "Basic " + Base64.encodeBytes((pref.getUsername() + ":" + pref.getPassword()).getBytes()));
-
+            URLConnection conn = createUrlConnection(urlStr, false);
             String response = IOUtils.toString(conn.getInputStream());
             JSONArray top25 = new JSONArray(response);
             for (int i = 0; i < top25.length(); i++) {
@@ -269,14 +233,10 @@ public class GpodderAPI {
         try {
             urls.put(url);
             device.put("add", urls);
-            Preferences pref = Preferences.getPreferences(context);
-            urlStr = urlStr.replace("USERNAME", pref.getUsername());
-            urlStr = urlStr.replace("DEVICE", pref.getDevice());
-            URLConnection con = new URL(urlStr).openConnection();
+            urlStr = urlStr.replace("USERNAME", GpodRoid.prefs.getUsername());
+            urlStr = urlStr.replace("DEVICE", GpodRoid.prefs.getDevice());
+            URLConnection con = createUrlConnection(urlStr, true);
             con.setDoOutput(true);
-
-            con.setRequestProperty("Authorization",
-                    "Basic " + Base64.encodeBytes((pref.getUsername() + ":" + pref.getPassword()).getBytes()));
 
             Log.d(GpodRoid.LOGTAG, "sending subscription: " + urlStr + " with body " + device.toString());
             OutputStreamWriter out = new OutputStreamWriter(con.getOutputStream());
@@ -302,6 +262,37 @@ public class GpodderAPI {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+    }
+
+    /**
+     * create the UrlConnection
+     * @param urlStr string representation of url
+     * @param authRequired is basich authentication required
+     * @return URLconnection
+     * @throws IOException
+     */
+    private URLConnection createUrlConnection(String urlStr, boolean authRequired) throws IOException {
+        String version = "GpodRoid unidentified";
+        try {
+            PackageInfo packageInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
+            version = "GpodRoid " + packageInfo.versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            Log.e(GpodRoid.LOGTAG, "error setting version info in header", e);
+        }
+
+
+        URLConnection con = new URL(urlStr).openConnection();
+        con.setDoOutput(true);
+        if (authRequired) {
+            Preferences pref = Preferences.getPreferences(context);
+            urlStr = urlStr.replace("USERNAME", pref.getUsername());
+            urlStr = urlStr.replace("DEVICE", pref.getDevice());
+            con.addRequestProperty("Authorization",
+                    "Basic " + Base64.encodeBytes((pref.getUsername() + ":" + pref.getPassword()).getBytes()));
+        }
+        con.addRequestProperty("User-Agent", version);
+
+        return con;
     }
 
 
