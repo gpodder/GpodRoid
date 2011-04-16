@@ -45,19 +45,28 @@ public class Player extends RoboActivityDefaultMenu implements OnClickListener, 
     public static boolean switchPodcast;
 
     // podcast information
-    @InjectView(R.id.tv_podcast_title) private TextView tvTitle;
-    @InjectView(R.id.tv_episode_name) private TextView tvEpisode;
-    @InjectView(R.id.tv_total_time) private TextView tvTotalTime;
-    @InjectView(R.id.tv_position_time) private TextView tvPositionTime;
+    @InjectView(R.id.tv_podcast_title)
+    private TextView tvTitle;
+    @InjectView(R.id.tv_episode_name)
+    private TextView tvEpisode;
+    @InjectView(R.id.tv_total_time)
+    private TextView tvTotalTime;
+    @InjectView(R.id.tv_position_time)
+    private TextView tvPositionTime;
 
     // cover art
-    @InjectView(R.id.iv_cover) private ImageView ivCover;
+    @InjectView(R.id.iv_cover)
+    private ImageView ivCover;
 
     // buttons
-    @InjectView(R.id.btn_forward) private ImageButton btnForward;
-    @InjectView(R.id.btn_backward) private ImageButton btnBackward;
-    @InjectView(R.id.btn_play) private ImageButton btnPlay;
-    @InjectView(R.id.bar_playback) private SeekBar barProgress;
+    @InjectView(R.id.btn_forward)
+    private ImageButton btnForward;
+    @InjectView(R.id.btn_backward)
+    private ImageButton btnBackward;
+    @InjectView(R.id.btn_play)
+    private ImageButton btnPlay;
+    @InjectView(R.id.bar_playback)
+    private SeekBar barProgress;
 
 
     @Override
@@ -162,34 +171,34 @@ public class Player extends RoboActivityDefaultMenu implements OnClickListener, 
 
     @Override
     public void onClick(View view) {
-
-        if (mp == null) {
-            //seems we have been sleeping a while
-            play();
+        if (pce == null) {
+            Intent intent = new Intent(getApplicationContext(), PodcastManager.class);
+            startActivity(intent);
         }
 
-        if (view == btnBackward) {
-            seek(-mp.getDuration() / 50);
-        } else if (view == btnForward) {
-            seek(mp.getDuration() / 50);
-        } else if (view == btnPlay) {
-            if (pce == null) {
-                Intent intent = new Intent(getApplicationContext(), PodcastManager.class);
-                startActivity(intent);
-            }
 
-            if (mp.isPlaying()) {
-                savePlaybackState();
-                btnPlay.setImageResource(android.R.drawable.ic_media_play);
-                mp.pause();
-
-            } else {
-                mp.start();
-                btnPlay.setImageResource(android.R.drawable.ic_media_pause);
-            }
-
+        switch (view.getId()) {
+            case R.id.btn_backward:
+                seek(-mp.getDuration() / 50);
+                break;
+            case R.id.btn_forward:
+                seek(mp.getDuration() / 50);
+                break;
+            case R.id.btn_play:
+                if (mp == null) {
+                    play();
+                }
+                if (mp.isPlaying()) {
+                    savePlaybackState();
+                    btnPlay.setImageResource(android.R.drawable.ic_media_play);
+                    mp.pause();
+                } else {
+                    mp.start();
+                    btnPlay.setImageResource(android.R.drawable.ic_media_pause);
+                    progressReader();
+                }
+                break;
         }
-
 
     }
 
@@ -280,8 +289,6 @@ public class Player extends RoboActivityDefaultMenu implements OnClickListener, 
 
     //TODO release mediaplayer if its not in use for a while
     // workaround for http://code.google.com/p/android/issues/detail?id=4124
-
-
 
 
 }
