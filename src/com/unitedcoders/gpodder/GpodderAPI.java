@@ -1,14 +1,18 @@
 package com.unitedcoders.gpodder;
 
 import android.content.Context;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.util.Log;
-
+import android.webkit.WebView;
 import com.unitedcoders.android.gpodroid.Base64;
 import com.unitedcoders.android.gpodroid.GpodRoid;
-import com.unitedcoders.android.gpodroid.Preferences;
+import org.apache.commons.io.IOUtils;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
@@ -18,13 +22,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import org.apache.commons.io.IOUtils;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.json.JSONArray;
-import org.json.JSONObject;
-
 /**
  * The calls against gpodder.net API
  *
@@ -32,59 +29,68 @@ import org.json.JSONObject;
  */
 public class GpodderAPI {
 
-	private static final String GPODDER_BASE = "http://gpodder.net";
+    private static final String GPODDER_BASE = "http://gpodder.net";
     public static final String PREFS_NAME = "gpodroidPrefs";
     private static GpodderUpdates downloadListResponse = null;
-    
+
     /**
      * This member is meant to be populated right at the beginning of the application in the "main" function
      * and will be referenced for the duration of the application
      */
     public static Context context = null;
-    
-    public static URLConnection createUrlConnection(String urlStr, Boolean useAuthentication, Boolean setOutput){
-    	Log.i(GpodRoid.LOGTAG, "Creating Connection to " + urlStr);
-    	
-    	String version = "GpodRoid unidentified";
-        try {
-            PackageInfo packageInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
-            version = "GpodRoid " + packageInfo.versionName;
-        } 
-        catch (PackageManager.NameNotFoundException e) {
-            Log.e(GpodRoid.LOGTAG, "error setting version info in header", e);
+
+    /**
+     * The custom User-Agent we send for http requests
+     * uses GpodroidVersion + default Webview agent information
+     */
+    private static String customUserAgent = null;
+
+
+    public static URLConnection createUrlConnection(String urlStr, Boolean useAuthentication, Boolean setOutput) {
+        Log.i(GpodRoid.LOGTAG, "Creating Connection to " + urlStr);
+
+        // set custom User-Agent string
+        if (customUserAgent == null) {
+            try {
+                PackageInfo packageInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
+                String webviewAgent = new WebView(context).getSettings().getUserAgentString();
+                customUserAgent = "GpodRoid " + packageInfo.versionName+" "+webviewAgent;
+            } catch (PackageManager.NameNotFoundException e) {
+                Log.e(GpodRoid.LOGTAG, "error setting version info in header", e);
+                customUserAgent = "GpodRoid undefined";
+            }
         }
-    	
-    	URLConnection conn = null;
-		try {
-			conn = new URL(urlStr).openConnection();
-	    	conn.setDoOutput(setOutput);
-	    	conn.setDoInput(true);
 
-	    	if(useAuthentication){
-		    	String auth = GpodRoid.prefs.getUsername() + ":" + GpodRoid.prefs.getPassword();
-		    	String encoded = Base64.encodeBytes(auth.getBytes());
-		        conn.setRequestProperty("Authorization","basic " + encoded);
-	    	}
-	    	conn.addRequestProperty("User-Agent", version);
-		} 
-		catch (Exception e) {
-			Log.e(GpodRoid.LOGTAG, "Error creating Connection: " + stackTrace(e));
-			return null;
-		} 
+        URLConnection conn = null;
+        try {
+            conn = new URL(urlStr).openConnection();
+            conn.setDoOutput(setOutput);
+            conn.setDoInput(true);
 
-    	return conn;
+            if (useAuthentication) {
+                String auth = GpodRoid.prefs.getUsername() + ":" + GpodRoid.prefs.getPassword();
+                String encoded = Base64.encodeBytes(auth.getBytes());
+                conn.setRequestProperty("Authorization", "basic " + encoded);
+            }
+            conn.addRequestProperty("User-Agent", customUserAgent);
+        } catch (Exception e) {
+            Log.e(GpodRoid.LOGTAG, "Error creating Connection: " + stackTrace(e));
+            return null;
+        }
+
+        return conn;
     }
-    
-    public static String stackTrace(Exception e){
-    	String eol = System.getProperty("line.separator");
-    	String stack = eol + e.getMessage() + eol;
-    	
-    	StackTraceElement[] stackTraces = e.getStackTrace();
-    	for(int cste = 0 ; cste < stackTraces.length ; cste++){
-    		stack += stackTraces[cste].toString() + eol;
-    	}
-    	
-    	return stack;
+
+    public static String stackTrace(Exception e) {
+        String eol = System.getProperty("line.separator");
+        String stack = eol + e.getMessage() + eol;
+
+        StackTraceElement[] stackTraces = e.getStackTrace();
+        for (int cste = 0; cste < stackTraces.length; cste++) {
+            stack += stackTraces[cste].toString() + eol;
+        }
+
+        return stack;
     }
 
     public static GpodderUpdates getDownloadList() {
@@ -100,10 +106,9 @@ public class GpodderAPI {
             InputStream is = conn.getInputStream();
             downloadListResponse = new ObjectMapper().readValue(is, GpodderUpdates.class);
             is.close();
-        } 
-        catch (Exception e) {
+        } catch (Exception e) {
             Log.e(GpodRoid.LOGTAG, "Failed to download subscription list: " + stackTrace(e));
-        } 
+        }
 
         //experimental, fill sql
         return downloadListResponse;
@@ -140,6 +145,7 @@ public class GpodderAPI {
 
     /**
      * gets the devices associated with the user
+     *
      * @return ArrayList<String> A list of strings which are the names of the devices
      */
     public static ArrayList<String> getDevices() {
@@ -179,8 +185,7 @@ public class GpodderAPI {
 
             }
             Log.i(GpodRoid.LOGTAG, "Successfully downloaded top subscriptions.");
-        } 
-        catch (Exception e) {
+        } catch (Exception e) {
             Log.e(GpodRoid.LOGTAG, "Error getting Top Subscriptions:" + stackTrace(e));
         }
 
@@ -201,8 +206,7 @@ public class GpodderAPI {
                 subscriptions.put(title, subUrl);
 
             }
-        } 
-        catch (Exception e) {
+        } catch (Exception e) {
             Log.e(GpodRoid.LOGTAG, "Error searching feeds:" + stackTrace(e));
         }
 
@@ -238,7 +242,7 @@ public class GpodderAPI {
             in.close();
 
         } catch (Exception e) {
-        	Log.e(GpodRoid.LOGTAG, "Error adding subscription:" + stackTrace(e));
+            Log.e(GpodRoid.LOGTAG, "Error adding subscription:" + stackTrace(e));
         }
     }
 }
