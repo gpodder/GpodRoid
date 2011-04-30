@@ -35,7 +35,7 @@ public class Subscribe extends RoboListActivity implements View.OnClickListener 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.subscribe);
 
-        top25hm = new GpodderAPI(getApplicationContext()).getTopSubscriptions(getApplicationContext());
+        top25hm = GpodderAPI.getTopSubscriptions();
         top25 = new ArrayList<String>(top25hm.keySet());
         this.setListAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, top25));
         registerForContextMenu(getListView());
@@ -46,10 +46,8 @@ public class Subscribe extends RoboListActivity implements View.OnClickListener 
 
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
-        // TODO Auto-generated method stub
         super.onCreateContextMenu(menu, v, menuInfo);
         menu.add("subscribe");
-
     }
 
     @Override
@@ -62,7 +60,7 @@ public class Subscribe extends RoboListActivity implements View.OnClickListener 
         new Thread(new Runnable() {
             @Override
             public void run() {
-                new GpodderAPI(getApplicationContext()).addSubcription(getApplicationContext(), top25hm.get(feed));
+                GpodderAPI.addSubcription(top25hm.get(feed));
                 startService(new Intent(getApplicationContext(), UpdateService.class));
             }
         }).start();
@@ -76,8 +74,7 @@ public class Subscribe extends RoboListActivity implements View.OnClickListener 
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btn_podcast_search:
-                String search = etPodcastSearch.getText().toString();
-                top25hm = new GpodderAPI(getApplicationContext()).searchFeeds("search");
+                top25hm = GpodderAPI.searchFeeds("search");
                 top25 = new ArrayList<String>(top25hm.keySet());
                 this.setListAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, top25));
                 break;

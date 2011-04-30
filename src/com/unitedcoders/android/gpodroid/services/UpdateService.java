@@ -1,17 +1,13 @@
 package com.unitedcoders.android.gpodroid.services;
 
 import android.app.Service;
-import android.content.ContentValues;
-import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
 import com.unitedcoders.android.gpodroid.GpodRoid;
 import com.unitedcoders.android.gpodroid.Preferences;
-import com.unitedcoders.android.gpodroid.ShowProvider;
 import com.unitedcoders.android.gpodroid.activity.AccountSettings;
 import com.unitedcoders.android.gpodroid.database.GpodDB;
 import com.unitedcoders.gpodder.GpodderAPI;
@@ -40,17 +36,15 @@ public class UpdateService extends Service {
     public void onStart(Intent intent, int startId) {
         super.onStart(intent, startId);
         downloadProcessing();
-
     }
-
+   
     public synchronized void downloadProcessing() {
 
         Preferences pref = Preferences.getPreferences(getApplicationContext());
-
+        
         if (pref.getUsername().equals("") || pref.getPassword().equals("") || pref.getDevice().equals("")) {
 
-            Toast toast = Toast.makeText(getApplicationContext(), "please enter your settings first",
-                    Toast.LENGTH_SHORT);
+            Toast toast = Toast.makeText(getApplicationContext(), "please enter your settings first", Toast.LENGTH_SHORT);
             toast.show();
 
             Intent intent = new Intent(getApplicationContext(), AccountSettings.class);
@@ -61,7 +55,6 @@ public class UpdateService extends Service {
             return;
 
         }
-
 
         Thread thread = new Thread(null, doGetPodcastDownloadInfo, "Background");
         thread.start();
@@ -80,18 +73,18 @@ public class UpdateService extends Service {
     };
 
     private void backgroundPodcastInfoFetcher() {
-        GpodderUpdates podcast = new GpodderAPI(getApplicationContext()).getDownloadList();
-
-        GpodDB gpdb = new GpodDB(getApplicationContext());
+    	GpodderAPI.context= getApplicationContext();
+        GpodderUpdates podcast = GpodderAPI.getDownloadList();
 
         if (podcast == null) {
             Log.e(GpodRoid.LOGTAG, "cant display downloads, got empty result");
             return;
         }
 
+        GpodDB gpdb = new GpodDB(getApplicationContext());
+
         List<GpodderPodcast> pcl = podcast.getUpdates();
         gpdb.addPodcasts(pcl);
-
 
         handler.post(doUpdateDownloadList);
 
@@ -101,6 +94,4 @@ public class UpdateService extends Service {
         subscriptionChanged.setAction(GpodRoid.BROADCAST_SUBSCRIPTION_CHANGE);
         sendBroadcast(subscriptionChanged);
     }
-
-
 }

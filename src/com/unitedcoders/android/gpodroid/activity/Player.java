@@ -11,11 +11,7 @@ import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.text.style.SubscriptSpan;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.*;
@@ -24,7 +20,8 @@ import com.unitedcoders.android.gpodroid.*;
 import com.unitedcoders.android.gpodroid.database.GpodDB;
 import com.unitedcoders.android.gpodroid.services.UpdateService;
 import com.unitedcoders.android.gpodroid.tools.Tools;
-import roboguice.activity.RoboActivity;
+import com.unitedcoders.gpodder.GpodderAPI;
+
 import roboguice.inject.InjectView;
 
 /**
@@ -68,12 +65,14 @@ public class Player extends RoboActivityDefaultMenu implements OnClickListener, 
     @InjectView(R.id.bar_playback)
     private SeekBar barProgress;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        // TODO Auto-generated method stub
         super.onCreate(savedInstanceState);
         setContentView(R.layout.playerview);
+        
+        // set the GpodderAPI context here so that we will never have to 
+        // access it again, otherwise there are calls over
+        GpodderAPI.context = getApplicationContext();
 
         startService(new Intent(getApplicationContext(), UpdateService.class));
 
@@ -84,10 +83,8 @@ public class Player extends RoboActivityDefaultMenu implements OnClickListener, 
             switchPodcast = false;
         }
 
-
         // load preferences
         GpodRoid.prefs = Preferences.getPreferences(getApplicationContext());
-
 
         barProgress.setOnSeekBarChangeListener(this);
         btnForward.setOnClickListener(this);
