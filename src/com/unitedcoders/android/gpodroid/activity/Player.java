@@ -1,8 +1,5 @@
 package com.unitedcoders.android.gpodroid.activity;
 
-import java.io.File;
-import java.io.IOException;
-
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -14,15 +11,19 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.*;
-
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.SeekBar;
+import android.widget.TextView;
 import com.unitedcoders.android.gpodroid.*;
 import com.unitedcoders.android.gpodroid.database.GpodDB;
 import com.unitedcoders.android.gpodroid.services.UpdateService;
 import com.unitedcoders.android.gpodroid.tools.Tools;
 import com.unitedcoders.gpodder.GpodderAPI;
-
 import roboguice.inject.InjectView;
+
+import java.io.File;
+import java.io.IOException;
 
 /**
  * Shows the MediaPlayer and controls
@@ -34,8 +35,7 @@ public class Player extends RoboActivityDefaultMenu implements OnClickListener, 
     final Handler handler = new Handler();
     private static int playbackPosition;
 
-    // private static File podcast;
-    private static MediaPlayer mp;
+    public static MediaPlayer mp;
 
     // Element playing
     public static Episode pce;
@@ -69,8 +69,8 @@ public class Player extends RoboActivityDefaultMenu implements OnClickListener, 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.playerview);
-        
-        // set the GpodderAPI context here so that we will never have to 
+
+        // set the GpodderAPI context here so that we will never have to
         // access it again, otherwise there are calls over
         GpodderAPI.context = getApplicationContext();
 

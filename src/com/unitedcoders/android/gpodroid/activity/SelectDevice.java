@@ -1,22 +1,18 @@
 package com.unitedcoders.android.gpodroid.activity;
 
-import java.util.ArrayList;
-
 import android.app.AlertDialog;
 import android.app.ListActivity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ListView;
-import android.widget.Toast;
-
+import android.widget.*;
 import com.unitedcoders.android.gpodroid.GpodRoid;
 import com.unitedcoders.android.gpodroid.Preferences;
 import com.unitedcoders.android.gpodroid.R;
@@ -24,34 +20,43 @@ import com.unitedcoders.android.gpodroid.database.GpodDB;
 import com.unitedcoders.android.gpodroid.services.UpdateService;
 import com.unitedcoders.gpodder.GpodderAPI;
 
+import java.util.ArrayList;
+
 /**
  * Shows gpodder registered devices.
- * 
+ *
  * @author Nico Heid
- * 
  */
 public class SelectDevice extends ListActivity implements OnClickListener {
 
-    Button btnCustomName;
-    Preferences pref;
-    ArrayList<String> devices;
+    private Button btnCustomName;
+    private Preferences pref;
+    private ArrayList<String> devices;
+    private Handler handler;
+    private ProgressDialog wheel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        // TODO Auto-generated method stub
+
         super.onCreate(savedInstanceState);
+
+        handler = new Handler();
         setContentView(R.layout.select_device);
         Context cont = getApplicationContext();
 
-        devices = GpodderAPI.getDevices();
-        if(devices == null){
-    		Toast.makeText(cont, "Failed to download devices.", Toast.LENGTH_SHORT).show();
-        	return;
-    	}
-        Log.i("GPR", "populating device list");
+        wheel = ProgressDialog.show(this, "", "fetching devices", true);
+        getDevices();
 
-        setListAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, devices));
-        
+
+//        devices = GpodderAPI.getDevices();
+//        if (devices == null) {
+//            Toast.makeText(cont, "Failed to download devices.", Toast.LENGTH_SHORT).show();
+//            return;
+//        }
+//        Log.i("GPR", "populating device list");
+
+//        setListAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, devices));
+
         btnCustomName = (Button) findViewById(R.id.btn_customname);
         btnCustomName.setOnClickListener(this);
 
@@ -88,14 +93,15 @@ public class SelectDevice extends ListActivity implements OnClickListener {
 
             @Override
             public void onClick(DialogInterface dialog, int which) {
-            	Context cont = getApplicationContext();
-        		GpodderAPI.createDevice(cont, customName.getText().toString());
-            	devices = GpodderAPI.getDevices();
-            	if(devices == null){
-            		Toast.makeText(cont, "Failed to download devices.", Toast.LENGTH_SHORT).show();
-                	return;
-            	}
-            	setListAdapter(new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, devices));
+                Context cont = getApplicationContext();
+                GpodderAPI.createDevice(cont, customName.getText().toString());
+                devices = GpodderAPI.getDevices();
+                if (devices == null) {
+                    Toast.makeText(cont, "Failed to download devices.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                setListAdapter(new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1,
+                                                        devices));
             }
         });
         alert.setNegativeButton("Cancel", null);
@@ -106,6 +112,37 @@ public class SelectDevice extends ListActivity implements OnClickListener {
         pref = Preferences.getPreferences(getApplicationContext());
         pref.setDevice(deviceName);
         pref.save();
+    }
+
+    private void getDevices() {
+        Thread t = new Thread() {
+            @Override
+            public void run() {
+                Looper.prepare();
+                devices = GpodderAPI.getDevices();
+                handler.post(displayResults);
+            }
+        };
+        t.start();
+    }
+
+    final Runnable displayResults = new Runnable() {
+        @Override
+        public void run() {
+            displayResultsInUI();
+
+        }
+    };
+
+    private void displayResultsInUI() {
+        wheel.dismiss();
+        if (devices == null) {
+            Toast.makeText(getApplicationContext(), "Failed to download devices.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        Log.i(GpodRoid.LOGTAG, "populating device list");
+        setListAdapter(new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, devices));
+
     }
 
 }

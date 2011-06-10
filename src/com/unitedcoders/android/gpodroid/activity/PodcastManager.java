@@ -5,8 +5,8 @@ import android.content.*;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
-import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.*;
@@ -65,7 +65,7 @@ public class PodcastManager extends RoboTabActivity implements OnClickListener {
 
         mTabHost.addTab(mTabHost.newTabSpec("tab_test1").setIndicator("Podcasts").setContent(R.id.tabmgr_sdcard));
         mTabHost.addTab(mTabHost.newTabSpec("tab_test3").setIndicator("New")
-                .setContent(R.id.tabmgr_subscriptions));
+                                .setContent(R.id.tabmgr_subscriptions));
 
         mTabHost.setCurrentTab(0);
 
@@ -155,7 +155,7 @@ public class PodcastManager extends RoboTabActivity implements OnClickListener {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         Episode episode = (Episode) av.getItemAtPosition(pos);
-                        if(episode.getDownloaded()!=1){
+                        if (episode.getDownloaded() != 1) {
                             return;
                         }
                         File f = new File(episode.getFile());

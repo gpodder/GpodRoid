@@ -1,32 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-	package="com.unitedcoders.android.gpodroid" android:versionCode="6"
-	android:versionName="0.4.1-beta">
+          package="com.unitedcoders.android.gpodroid" android:versionCode="6"
+          android:versionName="0.4.1-beta">
     <uses-sdk android:minSdkVersion="7"/>
-	<application android:icon="@drawable/icon" android:label="@string/app_name" android:debuggable="true"  android:name="GpodRoid">
-		<activity android:name=".activity.Player" android:label="@string/app_name">
-			<intent-filter>
-				<action android:name="android.intent.action.MAIN" />
-				<category android:name="android.intent.category.LAUNCHER" />
-				<action android:name="com.unitedcoders.android.gpodroid.PLAYPODCAST"/>
-			</intent-filter>
-		</activity>
+    <application android:icon="@drawable/icon" android:label="@string/app_name" android:debuggable="true"
+                 android:name="GpodRoid">
+        <activity android:name=".activity.Player" android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+                <action android:name="com.unitedcoders.android.gpodroid.PLAYPODCAST"/>
+            </intent-filter>
+        </activity>
 
-		<activity android:name=".activity.DownloadProgress" />
-		<activity android:name=".activity.AccountSettings" />
-        <activity android:name=".activity.SelectDevice" />
+        <activity android:name=".activity.DownloadProgress"/>
+        <activity android:name=".activity.AccountSettings"/>
+        <activity android:name=".activity.SelectDevice"/>
         <activity android:name=".activity.PodcastManager"/>
-        <activity android:name=".activity.Subscribe" />
+        <activity android:name=".activity.Subscribe"/>
 
-        <service android:name=".services.DownloadService" />
-        <service android:name=".services.UpdateService" />
+        <service android:name=".services.DownloadService"/>
+        <service android:name=".services.UpdateService"/>
 
         <provider android:name=".ShowProvider"
-			android:authorities="com.unitedcoders.android.gpodroid.Provider" />
-	
-	</application>
-	
-	<uses-permission android:name="android.permission.INTERNET"></uses-permission>
-	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"></uses-permission>
+                  android:authorities="com.unitedcoders.android.gpodroid.Provider"/>
+
+        <!--<receiver android:name=".activity.IncomingCallReceiver" android:enabled="true">-->
+            <!--<intent-filter>-->
+                <!--<action android:name="android.intent.action.PHONE_STATE"/>-->
+            <!--</intent-filter>-->
+        <!--</receiver>-->
+
+    </application>
+
+    <uses-permission android:name="android.permission.INTERNET"></uses-permission>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"></uses-permission>
+    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
 
 </manifest> 

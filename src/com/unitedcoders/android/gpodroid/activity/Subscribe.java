@@ -103,6 +103,7 @@ public class Subscribe extends RoboActivity implements View.OnClickListener {
 
     private void displayTopPodcasts() {
         Thread t = new Thread() {
+            @Override
             public void run() {
                 top25hm = GpodderAPI.getTopSubscriptions();
                 top25 = new ArrayList<String>(top25hm.keySet());

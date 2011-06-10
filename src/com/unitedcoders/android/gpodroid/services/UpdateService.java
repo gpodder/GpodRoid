@@ -4,6 +4,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.util.Log;
 import android.widget.Toast;
 import com.unitedcoders.android.gpodroid.GpodRoid;
@@ -17,11 +18,7 @@ import com.unitedcoders.gpodder.GpodderUpdates;
 import java.util.List;
 
 /**
- * Created by IntelliJ IDEA.
- * User: nheid
- * Date: 2/26/11
- * Time: 12:27 PM
- * To change this template use File | Settings | File Templates.
+ * Get updates from gpodder
  */
 public class UpdateService extends Service {
 
@@ -37,14 +34,15 @@ public class UpdateService extends Service {
         super.onStart(intent, startId);
         downloadProcessing();
     }
-   
+
     public synchronized void downloadProcessing() {
 
         Preferences pref = Preferences.getPreferences(getApplicationContext());
-        
+
         if (pref.getUsername().equals("") || pref.getPassword().equals("") || pref.getDevice().equals("")) {
 
-            Toast toast = Toast.makeText(getApplicationContext(), "please enter your settings first", Toast.LENGTH_SHORT);
+            Toast toast =
+                    Toast.makeText(getApplicationContext(), "please enter your settings first", Toast.LENGTH_SHORT);
             toast.show();
 
             Intent intent = new Intent(getApplicationContext(), AccountSettings.class);
@@ -68,12 +66,13 @@ public class UpdateService extends Service {
 
     private Runnable doGetPodcastDownloadInfo = new Runnable() {
         public void run() {
+            Looper.prepare();
             backgroundPodcastInfoFetcher();
         }
     };
 
     private void backgroundPodcastInfoFetcher() {
-    	GpodderAPI.context= getApplicationContext();
+        GpodderAPI.context = getApplicationContext();
         GpodderUpdates podcast = GpodderAPI.getDownloadList();
 
         if (podcast == null) {
