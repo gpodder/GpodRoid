@@ -3,7 +3,7 @@
   xmlns:android="http://schemas.android.com/apk/res/android">
 
 
-  <item android:id="@+id/subscriptions" android:icon="@drawable/android:ic_menu_agenda" android:title="subscriptions" />
-  <item android:id="@+id/fetch_updates" android:icon="@drawable/android:ic_menu_agenda" android:title="subscriptions" />
+  <item android:id="@+id/fetch_updates" android:icon="@drawable/android:ic_popup_sync" android:title="fetch updates" />
+  <!--<item android:id="@+id/fetch_updates" android:icon="@drawable/android:ic_menu_agenda" android:title="subscriptions" />-->
 
 </menu>

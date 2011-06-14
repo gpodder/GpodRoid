@@ -68,6 +68,7 @@ public class UpdateService extends Service {
         public void run() {
             Looper.prepare();
             backgroundPodcastInfoFetcher();
+            Looper.loop();
         }
     };
 

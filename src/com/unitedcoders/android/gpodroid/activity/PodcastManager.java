@@ -4,16 +4,14 @@ import android.app.AlertDialog;
 import android.content.*;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.KeyEvent;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.View;
+import android.view.*;
 import android.view.View.OnClickListener;
 import android.widget.*;
 import android.widget.AdapterView.OnItemClickListener;
 import com.unitedcoders.android.gpodroid.*;
 import com.unitedcoders.android.gpodroid.database.GpodDB;
 import com.unitedcoders.android.gpodroid.services.DownloadService;
+import com.unitedcoders.android.gpodroid.services.UpdateService;
 import roboguice.activity.RoboTabActivity;
 import roboguice.inject.InjectView;
 
@@ -27,12 +25,16 @@ public class PodcastManager extends RoboTabActivity implements OnClickListener {
     private TabHost mTabHost;
 
     // podcasts in archive
-    @InjectView(R.id.lv_shows) private ListView lvShows;
-    @InjectView(R.id.lv_podcasts) private ListView lvPodcasts;
-    @InjectView(R.id.lv_downloads) private ListView lvDownloads;
+    @InjectView(R.id.lv_shows)
+    private ListView lvShows;
+    @InjectView(R.id.lv_podcasts)
+    private ListView lvPodcasts;
+    @InjectView(R.id.lv_downloads)
+    private ListView lvDownloads;
 //    private ListView lvDownloads;
 
-    @InjectView(R.id.tabmgr_sdcard) private ViewFlipper sdcardFlipper;
+    @InjectView(R.id.tabmgr_sdcard)
+    private ViewFlipper sdcardFlipper;
     private PodcastListAdapter podcastAdapter;
     private PodcastListAdapter downloadAdapter;
     private ArrayAdapter showAdapter;
@@ -65,12 +67,9 @@ public class PodcastManager extends RoboTabActivity implements OnClickListener {
 
         mTabHost.addTab(mTabHost.newTabSpec("tab_test1").setIndicator("Podcasts").setContent(R.id.tabmgr_sdcard));
         mTabHost.addTab(mTabHost.newTabSpec("tab_test3").setIndicator("New")
-                                .setContent(R.id.tabmgr_subscriptions));
+                .setContent(R.id.tabmgr_subscriptions));
 
         mTabHost.setCurrentTab(0);
-
-//        showShows();
-//        showDownloads();
 
 
     }
@@ -105,7 +104,9 @@ public class PodcastManager extends RoboTabActivity implements OnClickListener {
                 return super.onKeyDown(keyCode, event);
             }
         }
-        return true;
+
+
+        return super.onKeyDown(keyCode, event);
     }
 
 
@@ -276,5 +277,28 @@ public class PodcastManager extends RoboTabActivity implements OnClickListener {
         }
     };
 
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+//        super.onCreateOptionsMenu(menu);
+        if (getParent() != null) {
+            return getParent().onCreateOptionsMenu(menu);
+        }
+
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.podcastmanager, menu);
+        return true;
+    }
+
+    /**
+     * fetch new subscriptions
+     * @param item
+     * @return
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        startService(new Intent(getApplicationContext(), UpdateService.class));
+        return super.onOptionsItemSelected(item);
+    }
 
 }

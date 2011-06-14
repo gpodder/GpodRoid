@@ -121,6 +121,7 @@ public class SelectDevice extends ListActivity implements OnClickListener {
                 Looper.prepare();
                 devices = GpodderAPI.getDevices();
                 handler.post(displayResults);
+                Looper.loop();
             }
         };
         t.start();
