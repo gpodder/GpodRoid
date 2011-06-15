@@ -96,7 +96,7 @@ public class GpodderAPI {
     public static GpodderUpdates getDownloadList() {
         // try to get the updates
         try {
-            Long since = (new Date().getTime() / 1000) - 3600 * 24 * 14;
+            Long since = (new Date().getTime() / 1000) - 3600 * 24 * 56;
 
             String urlStr = GPODDER_BASE + "/api/2/updates/USERNAME/DEVICE.json?since=" + since;
             urlStr = urlStr.replace("USERNAME", GpodRoid.prefs.getUsername());
@@ -236,10 +236,15 @@ public class GpodderAPI {
 
             String decodedString;
 
+            StringBuffer response = new StringBuffer();
             while ((decodedString = in.readLine()) != null) {
-                System.out.println(decodedString);
+                response.append(decodedString);
+//                System.out.println(decodedString);
+
             }
             in.close();
+
+            Log.d(GpodRoid.LOGTAG, "Result of subscription request: "+response.toString());
 
         } catch (Exception e) {
             Log.e(GpodRoid.LOGTAG, "Error adding subscription:" + stackTrace(e));

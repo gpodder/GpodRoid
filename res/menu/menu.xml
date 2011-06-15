@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu
-  xmlns:android="http://schemas.android.com/apk/res/android">
+        xmlns:android="http://schemas.android.com/apk/res/android">
 
 
-  <item android:id="@+id/account" android:icon="@drawable/android:ic_menu_manage" android:title="account settings" />
-  <item android:id="@+id/subscriptions" android:icon="@drawable/android:ic_menu_agenda" android:title="subscriptions" />
+    <item android:id="@+id/account" android:icon="@drawable/android:ic_menu_manage" android:title="account settings"/>
+    <item android:id="@+id/subscriptions" android:icon="@drawable/android:ic_menu_agenda"
+          android:title="subscriptions"/>
+    <item android:id="@+id/fetch_updates" android:icon="@drawable/android:ic_popup_sync" android:title="fetch updates"/>
 
 </menu>

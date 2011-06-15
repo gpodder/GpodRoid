@@ -1,8 +1,10 @@
 package com.unitedcoders.android.gpodroid.activity;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.*;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.*;
 import android.view.View.OnClickListener;
@@ -12,10 +14,13 @@ import com.unitedcoders.android.gpodroid.*;
 import com.unitedcoders.android.gpodroid.database.GpodDB;
 import com.unitedcoders.android.gpodroid.services.DownloadService;
 import com.unitedcoders.android.gpodroid.services.UpdateService;
+import com.unitedcoders.gpodder.GpodderAPI;
 import roboguice.activity.RoboTabActivity;
 import roboguice.inject.InjectView;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class PodcastManager extends RoboTabActivity implements OnClickListener {
@@ -50,6 +55,18 @@ public class PodcastManager extends RoboTabActivity implements OnClickListener {
     public static boolean archiveDirty = false;
     private static IntentFilter filter = new IntentFilter();
 
+    @InjectView(R.id.lv_search_results) ListView lvSearchResults;
+    ProgressDialog searching;
+
+
+    @InjectView(R.id.btn_podcast_search) ImageButton btnPodcastSearch;
+    @InjectView(R.id.et_podcast_search) EditText etPodcastSearch;
+
+
+    private final Handler handler = new Handler();
+    ArrayList<String> top25;
+    HashMap<String, String> top25hm;
+
 
     static {
         filter.addAction(GpodRoid.BROADCAST_SUBSCRIPTION_CHANGE);
@@ -65,12 +82,23 @@ public class PodcastManager extends RoboTabActivity implements OnClickListener {
 
         mTabHost = getTabHost();
 
-        mTabHost.addTab(mTabHost.newTabSpec("tab_test1").setIndicator("Podcasts").setContent(R.id.tabmgr_sdcard));
-        mTabHost.addTab(mTabHost.newTabSpec("tab_test3").setIndicator("New")
-                .setContent(R.id.tabmgr_subscriptions));
+        mTabHost.addTab(mTabHost.newTabSpec("tab_podcasts").setIndicator("Podcasts").setContent(R.id.tabmgr_sdcard));
+        mTabHost.addTab(mTabHost.newTabSpec("tab_new").setIndicator("New").setContent(R.id.tabmgr_subscriptions));
+        mTabHost.addTab(
+                mTabHost.newTabSpec("tab_search").setIndicator("Search").setContent(R.id.tabmgr_podcast_search));
 
         mTabHost.setCurrentTab(0);
 
+        registerForContextMenu(lvSearchResults);
+
+        etPodcastSearch.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (etPodcastSearch.getText().equals("search for subscriptions")) {
+                    etPodcastSearch.setText("");
+                }
+            }
+        });
 
     }
 
@@ -100,12 +128,9 @@ public class PodcastManager extends RoboTabActivity implements OnClickListener {
             if (podcastSubmenu) {
                 sdcardFlipper.showNext();
                 podcastSubmenu = !podcastSubmenu;
-            } else {
-                return super.onKeyDown(keyCode, event);
+                return true;
             }
         }
-
-
         return super.onKeyDown(keyCode, event);
     }
 
@@ -292,13 +317,107 @@ public class PodcastManager extends RoboTabActivity implements OnClickListener {
 
     /**
      * fetch new subscriptions
+     *
      * @param item
      * @return
      */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        startService(new Intent(getApplicationContext(), UpdateService.class));
-        return super.onOptionsItemSelected(item);
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.account:
+                Intent account = new Intent(getApplicationContext(), AccountSettings.class);
+                startActivity(account);
+                return true;
+//            case R.id.subscriptions:
+//                Intent subscriptions = new Intent(getApplicationContext(), Subscribe.class);
+//                startActivity(subscriptions);
+//                return true;
+            case R.id.fetch_updates:
+                startService(new Intent(getApplicationContext(), UpdateService.class));
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
+
+
+//    @Override
+//    public void onTabChanged(String s) {
+//
+//    }
+
+    /**
+     * search for podcasts
+     *
+     * @param view
+     */
+    public void searchClicked(View view) {
+        searching = ProgressDialog.show(this, "Searching ...", "digging through podcasts", true, false);
+        searchPodcasts(etPodcastSearch.getText().toString());
+//        displayTopPodcasts();
+    }
+
+    private void searchPodcasts(final String searchTerm) {
+        Thread t = new Thread() {
+            public void run() {
+                top25hm = GpodderAPI.searchFeeds(searchTerm);
+                top25 = new ArrayList<String>(top25hm.keySet());
+                handler.post(displayResults);
+            }
+        };
+        t.start();
+    }
+
+//    private void displayTopPodcasts() {
+//        Thread t = new Thread() {
+//            @Override
+//            public void run() {
+//                top25hm = GpodderAPI.getTopSubscriptions();
+//                top25 = new ArrayList<String>(top25hm.keySet());
+//                handler.post(displayResults);
+//            }
+//        };
+//        t.start();
+//    }
+
+    final Runnable displayResults = new Runnable() {
+        @Override
+        public void run() {
+            displayResultsinUI();
+        }
+    };
+
+    private void displayResultsinUI() {
+        lvSearchResults.setAdapter(new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, top25));
+        searching.dismiss();
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        final String feed = (String) lvSearchResults.getItemAtPosition(info.position);
+        Log.d(GpodRoid.LOGTAG, "subscribing to " + top25hm.get(feed));
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                GpodderAPI.addSubcription(top25hm.get(feed));
+                startService(new Intent(getApplicationContext(), UpdateService.class));
+            }
+        }).start();
+
+
+        return super.onContextItemSelected(item);
+
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        menu.add("subscribe");
+    }
+
 
 }

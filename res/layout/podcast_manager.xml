@@ -23,6 +23,8 @@
                         /> <TextView android:id="@+id/tabone2" android:layout_width="fill_parent"
                         android:layout_height="fill_parent" android:text="@+string/tab1_content2"
                         /> -->
+
+
             </ViewFlipper>
 
 
@@ -33,6 +35,24 @@
                           android:layout_height="fill_parent"/>
 
             </LinearLayout>
+
+            <TableLayout android:id="@+id/tabmgr_podcast_search"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:stretchColumns="0">
+                <TableRow>
+                    <EditText android:id="@+id/et_podcast_search" android:layout_width="fill_parent"
+                              android:layout_height="wrap_content" android:layout_weight="1"
+                              android:layout_gravity="center_vertical" android:text="search for subscriptions"/>
+                    <ImageButton android:id="@+id/btn_podcast_search" android:src="@drawable/android:ic_menu_search"
+                                 android:layout_width="60dip" android:layout_height="wrap_content"
+                                 android:layout_gravity="center_vertical" android:onClick="searchClicked"/>
+                </TableRow>
+                <TableRow>
+                    <ListView android:id="@+id/lv_search_results" android:layout_width="fill_parent"
+                              android:layout_height="fill_parent"/>
+                </TableRow>
+            </TableLayout>
 
 
         </FrameLayout>
