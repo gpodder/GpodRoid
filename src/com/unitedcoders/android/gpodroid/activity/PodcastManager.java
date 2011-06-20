@@ -94,7 +94,7 @@ public class PodcastManager extends RoboTabActivity implements OnClickListener {
         etPodcastSearch.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (etPodcastSearch.getText().equals("search for subscriptions")) {
+                if (etPodcastSearch.getText().toString().equals("search for subscriptions")) {
                     etPodcastSearch.setText("");
                 }
             }
@@ -311,7 +311,7 @@ public class PodcastManager extends RoboTabActivity implements OnClickListener {
         }
 
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.podcastmanager, menu);
+        inflater.inflate(R.menu.menu, menu);
         return true;
     }
 

@@ -91,9 +91,9 @@ public class Player extends RoboActivityDefaultMenu implements OnClickListener, 
         btnBackward.setOnClickListener(this);
         btnPlay.setOnClickListener(this);
 
-//        if (pce != null) {
-//            play();
-//        }
+        if (pce != null) {
+            play();
+        }
     }
 
 

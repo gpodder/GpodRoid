@@ -5,7 +5,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import com.unitedcoders.android.gpodroid.activity.AccountSettings;
-import com.unitedcoders.android.gpodroid.activity.Subscribe;
+import com.unitedcoders.android.gpodroid.services.UpdateService;
 import roboguice.activity.RoboActivity;
 
 /**
@@ -31,9 +31,12 @@ public class RoboActivityDefaultMenu extends RoboActivity {
                 Intent account = new Intent(getApplicationContext(), AccountSettings.class);
                 startActivity(account);
                 return true;
-            case R.id.subscriptions:
-                Intent subscriptions = new Intent(getApplicationContext(), Subscribe.class);
-                startActivity(subscriptions);
+//            case R.id.subscriptions:
+//                Intent subscriptions = new Intent(getApplicationContext(), Subscribe.class);
+//                startActivity(subscriptions);
+//                return true;
+            case R.id.fetch_updates:
+                startService(new Intent(getApplicationContext(), UpdateService.class));
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
