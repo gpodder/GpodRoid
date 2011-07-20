@@ -7,5 +7,7 @@
 	<classpathentry kind="lib" path="jars/MyID3_for_Android.jar"/>
 	<classpathentry kind="lib" path="jars/jackson-core-asl-1.4.3.jar"/>
 	<classpathentry kind="lib" path="jars/jackson-mapper-asl-1.4.3.jar"/>
+	<classpathentry kind="lib" path="jars/guice-2.0-no_aop.jar"/>
+	<classpathentry kind="lib" path="jars/roboguice-1.1.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
