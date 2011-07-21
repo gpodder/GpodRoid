@@ -6,7 +6,7 @@
 	<TextView android:layout_width="fill_parent"
 		android:layout_height="wrap_content" android:text="Username" />
 	<EditText android:id="@+id/in_username" android:layout_width="fill_parent"
-		android:layout_height="wrap_content" android:text="EditText">
+		android:layout_height="wrap_content" android:text="EditText" android:singleLine="true" android:inputType="textNoSuggestions">
 	</EditText>
 	<TextView android:layout_width="fill_parent"
 		android:layout_height="wrap_content" android:text="Password" />
