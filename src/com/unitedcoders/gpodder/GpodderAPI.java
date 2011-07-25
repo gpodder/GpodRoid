@@ -5,8 +5,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.util.Log;
 import android.webkit.WebView;
-import com.unitedcoders.android.gpodroid.Base64;
-import com.unitedcoders.android.gpodroid.GpodRoid;
+import com.unitedcoders.android.gpodroid.*;
 import org.apache.commons.io.IOUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.json.JSONArray;
@@ -68,8 +67,7 @@ public class GpodderAPI {
             conn.setDoInput(true);
 
             if (useAuthentication) {
-                String auth = GpodRoid.prefs.getUsername() + ":" + GpodRoid.prefs.getPassword();
-                String encoded = Base64.encodeBytes(auth.getBytes());
+                String encoded = Preferences.getEncryptedAuthentication();
                 conn.setRequestProperty("Authorization", "basic " + encoded);
             }
             conn.addRequestProperty("User-Agent", customUserAgent);
@@ -99,8 +97,8 @@ public class GpodderAPI {
             Long since = (new Date().getTime() / 1000) - 3600 * 24 * 56;
 
             String urlStr = GPODDER_BASE + "/api/2/updates/USERNAME/DEVICE.json?since=" + since;
-            urlStr = urlStr.replace("USERNAME", GpodRoid.prefs.getUsername());
-            urlStr = urlStr.replace("DEVICE", GpodRoid.prefs.getDevice());
+            urlStr = urlStr.replace("USERNAME", Preferences.getUsername());
+            urlStr = urlStr.replace("DEVICE", Preferences.getDevice());
 
             URLConnection conn = createUrlConnection(urlStr, true, false);
             InputStream is = conn.getInputStream();
@@ -116,7 +114,7 @@ public class GpodderAPI {
 
 
     public static void createDevice(Context context, String deviceName) {
-        String urlStr = String.format(GPODDER_BASE + "/api/2/devices/%s/gpodroid.json", GpodRoid.prefs.getUsername());
+        String urlStr = String.format(GPODDER_BASE + "/api/2/devices/%s/gpodroid.json", Preferences.getUsername());
         JSONObject device = new JSONObject();
 
         try {
@@ -150,7 +148,7 @@ public class GpodderAPI {
      */
     public static ArrayList<String> getDevices() {
         ArrayList<String> gpodderDevices = new ArrayList<String>();
-        String urlStr = GPODDER_BASE + "/api/2/devices/" + GpodRoid.prefs.getUsername() + ".json";
+        String urlStr = GPODDER_BASE + "/api/2/devices/" + Preferences.getUsername() + ".json";
         try {
             URLConnection conn = createUrlConnection(urlStr, true, false);
             InputStream stream = conn.getInputStream();
@@ -222,8 +220,8 @@ public class GpodderAPI {
         try {
             urls.put(url);
             device.put("add", urls);
-            urlStr = urlStr.replace("USERNAME", GpodRoid.prefs.getUsername());
-            urlStr = urlStr.replace("DEVICE", GpodRoid.prefs.getDevice());
+            urlStr = urlStr.replace("USERNAME", Preferences.getUsername());
+            urlStr = urlStr.replace("DEVICE", Preferences.getDevice());
             URLConnection con = createUrlConnection(urlStr, true, false);
             con.setDoOutput(true);
 
@@ -239,7 +237,7 @@ public class GpodderAPI {
             StringBuffer response = new StringBuffer();
             while ((decodedString = in.readLine()) != null) {
                 response.append(decodedString);
-//                System.out.println(decodedString);
+//              System.out.println(decodedString);
 
             }
             in.close();

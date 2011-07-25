@@ -83,9 +83,6 @@ public class Player extends RoboActivityDefaultMenu implements OnClickListener, 
             switchPodcast = false;
         }
 
-        // load preferences
-        GpodRoid.prefs = Preferences.getPreferences(getApplicationContext());
-
         barProgress.setOnSeekBarChangeListener(this);
         btnForward.setOnClickListener(this);
         btnBackward.setOnClickListener(this);

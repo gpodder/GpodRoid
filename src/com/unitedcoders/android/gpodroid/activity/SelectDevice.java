@@ -30,7 +30,6 @@ import java.util.ArrayList;
 public class SelectDevice extends ListActivity implements OnClickListener {
 
     private Button btnCustomName;
-    private Preferences pref;
     public static ArrayList<String> devices;
     private Handler handler;
     private ProgressDialog wheel;
@@ -107,9 +106,8 @@ public class SelectDevice extends ListActivity implements OnClickListener {
     }
 
     private void saveDevice(String deviceName) {
-        pref = Preferences.getPreferences(getApplicationContext());
-        pref.setDevice(deviceName);
-        pref.save();
+        Preferences.setDevice(deviceName);
+        Preferences.save();
     }
 
     private void getDevices() {

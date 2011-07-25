@@ -46,8 +46,6 @@ public class PodcastManager extends RoboTabActivity implements OnClickListener {
 
 
     private PodcastListAdapter pcla;
-    private Preferences pref;
-
     private static String show = "";
 
     private boolean podcastSubmenu = false;

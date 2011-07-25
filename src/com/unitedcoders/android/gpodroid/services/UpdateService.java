@@ -36,14 +36,9 @@ public class UpdateService extends Service {
     }
 
     public synchronized void downloadProcessing() {
+        if (Preferences.getUsername().equals("") || Preferences.hasAuthentication() || Preferences.getDevice().equals("")) {
 
-        Preferences pref = Preferences.getPreferences(getApplicationContext());
-
-        if (pref.getUsername().equals("") || pref.getPassword().equals("") || pref.getDevice().equals("")) {
-
-            Toast toast =
-                    Toast.makeText(getApplicationContext(), "please enter your settings first", Toast.LENGTH_SHORT);
-            toast.show();
+            Toast.makeText(getApplicationContext(), "please enter your settings first", Toast.LENGTH_SHORT).show();
 
             Intent intent = new Intent(getApplicationContext(), AccountSettings.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

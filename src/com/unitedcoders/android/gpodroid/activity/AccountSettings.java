@@ -13,6 +13,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.unitedcoders.android.gpodroid.GpodRoid;
 import com.unitedcoders.android.gpodroid.Preferences;
 import com.unitedcoders.android.gpodroid.R;
 import com.unitedcoders.android.gpodroid.R.layout;
@@ -31,16 +32,13 @@ public class AccountSettings extends Activity {
         super.onCreate(savedInstanceState);
 
         setContentView(layout.accountsettings);
-        final Context context = getApplicationContext();
-        final Preferences pref = Preferences.getPreferences(context);
-
         final EditText etUsername = (EditText) findViewById(R.id.in_username);
         final EditText etPassword = (EditText) findViewById(R.id.in_password);
         final Button save = (Button) findViewById(R.id.btn_save);
         final Button register = (Button) findViewById(R.id.btn_register);
         
-        etUsername.setText(pref.getUsername());
-        etPassword.setText(pref.getPassword());
+        etUsername.setText(Preferences.getUsername());
+        etPassword.setText("");
               
         etUsername.setOnKeyListener(new OnKeyListener() { 
             public boolean onKey(View v, int keyCode, KeyEvent event) {
@@ -58,18 +56,17 @@ public class AccountSettings extends Activity {
         save.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-            	pref.setUsername(etUsername.getText().toString());
-                pref.setPassword(etPassword.getText().toString());
-                pref.save();
+            	Preferences.setUsernameAndPassword(etUsername.getText().toString(), etPassword.getText().toString());
+            	Preferences.save();
                 
                 // check to see if the user name and password function to get a list of devices as an check
                 SelectDevice.devices = GpodderAPI.getDevices();
                 if(SelectDevice.devices == null){
                 	// this is a failure to login using this user name and password so lets reset and continue
-                	Toast.makeText(context, "Could not authenticate this username and password.", Toast.LENGTH_SHORT).show();
+                	Toast.makeText(GpodRoid.context, "Could not authenticate this username and password.", Toast.LENGTH_SHORT).show();
                 }
                 else{
-                	startActivity(new Intent(context, SelectDevice.class));
+                	startActivity(new Intent(GpodRoid.context, SelectDevice.class));
                 	finish();
                 }
             }
