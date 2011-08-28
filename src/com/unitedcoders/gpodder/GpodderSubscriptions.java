@@ -10,6 +10,7 @@ public class GpodderSubscriptions {
     private String logo_url;
     private String website;
     private String mygpo_link;
+    private String scaled_logo_url;
     
     public String getTitle() {
         return title;
@@ -60,4 +61,11 @@ public class GpodderSubscriptions {
         mygpo_link = mygpoLink;
     }
 
+    public String getScaled_logo_url() {
+        return scaled_logo_url;
+    }
+
+    public void setScaled_logo_url(String scaled_logo_url) {
+        this.scaled_logo_url = scaled_logo_url;
+    }
 }
