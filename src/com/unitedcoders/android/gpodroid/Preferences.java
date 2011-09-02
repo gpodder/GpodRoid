@@ -18,6 +18,10 @@ public class Preferences {
     private static String encryptedAuthentication = "";
     private static String device = "";
 
+    public Preferences() {
+        super();    //To change body of overridden methods use File | Settings | File Templates.
+    }
+
     public static String getUsername() {
         return username;
     }
@@ -41,7 +45,7 @@ public class Preferences {
     }
     
     public static Boolean hasAuthentication(){
-    	return Preferences.encryptedAuthentication == "";
+    	return Preferences.encryptedAuthentication.equals("");
     }
     
     public static String getEncryptedAuthentication(){

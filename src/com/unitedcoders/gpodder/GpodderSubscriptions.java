@@ -8,9 +8,9 @@ public class GpodderSubscriptions {
     private String subscribers;
     private String subscribers_last_week;
     private String logo_url;
-    private String scaled_logo_url;
     private String website;
     private String mygpo_link;
+    private String scaled_logo_url;
     
     public String getTitle() {
         return title;
@@ -66,5 +66,4 @@ public class GpodderSubscriptions {
     public void setMygpo_link(String mygpoLink) {
         mygpo_link = mygpoLink;
     }
-
 }

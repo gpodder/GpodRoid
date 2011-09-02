@@ -57,19 +57,20 @@ public final class GpodDB {
 
     public static synchronized void addPodcasts(List<GpodderPodcast> pce) {
         for (int i = 0; i < pce.size(); i++) {
+
+
             GpodderPodcast gpodderPodcast = pce.get(i);
 
             // do we know this one?
             String podcast = gpodderPodcast.getPodcast_title();
             String show = gpodderPodcast.getTitle();
-            Cursor c = db.query(DATABASE_TABLE, new String[]{"title"}, "show=? and title=?", new String[]{show, podcast}, null, null, null, "1");
-
-            //Cursor c = db.rawQuery("select title from " + DATABASE_TABLE + " where show=? and title=? limit 1", new String[]{show, podcast});
+            Cursor c = db.query(DATABASE_TABLE, new String[]{"title"}, "show=? and title=?",  new String[]{show, podcast}, null, null, null, "1");
 
             if (c.getCount() > 0) {
                 c.close();
                 continue;
             }
+
 
             ContentValues map = new ContentValues();
             map.put("file", "");
@@ -81,7 +82,7 @@ public final class GpodDB {
             map.put("podcast_url", gpodderPodcast.getPodcast_url());
             map.put("released", gpodderPodcast.getReleased());
 
-            db.insert(DATABASE_TABLE, null, map);
+            long l = db.insert(DATABASE_TABLE, null, map);
             c.close();
         }
     }
@@ -91,12 +92,12 @@ public final class GpodDB {
         values.put("downloaded", episode.getDownloaded());
         values.put("file", episode.getFile());
 
-        db.update(DATABASE_TABLE, values, "show =? and title=?", new String[]{episode.getTitle(), episode.getPodcast_title()});
+        db.update(DATABASE_TABLE, values, "show =? and title=?",  new String[]{episode.getTitle(), episode.getPodcast_title()});
+
     }
 
     public static List<Episode> getEpisodes(String title) {
         Cursor c = db.query(DATABASE_TABLE, new String[]{"show, title, downloaded, url, file, _id, podcast_url"}, "title=?", new String[]{title}, null, null, null);
-
         ArrayList<Episode> podcasts = new ArrayList<Episode>();
 
         if (c.getCount() != 0) {
@@ -117,6 +118,7 @@ public final class GpodDB {
 
         c.close();
         return podcasts;
+
     }
 
     public static Episode getEpisode(int id) {
@@ -139,6 +141,7 @@ public final class GpodDB {
 
         c.close();
         return pce;
+
     }
 
     public static List<String> getPodcasts() {
