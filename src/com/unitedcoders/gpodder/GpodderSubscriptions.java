@@ -8,6 +8,7 @@ public class GpodderSubscriptions {
     private String subscribers;
     private String subscribers_last_week;
     private String logo_url;
+    private String scaled_logo_url;
     private String website;
     private String mygpo_link;
     
@@ -46,6 +47,12 @@ public class GpodderSubscriptions {
     }
     public void setLogo_url(String logoUrl) {
         logo_url = logoUrl;
+    }
+    public String getScaled_logo_url(){
+    	return scaled_logo_url;
+    }
+    public void setScaled_logo_url(String scaledLogoUrl){
+    	scaled_logo_url = scaledLogoUrl;
     }
     public String getWebsite() {
         return website;

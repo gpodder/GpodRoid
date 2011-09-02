@@ -40,12 +40,7 @@ import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import java.io.File;
 import java.io.IOException;
-import java.net.URL;
-import java.sql.Date;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * A simple service that takes an RSS feed and saves the data from the RSS feed.
@@ -57,10 +52,7 @@ import java.util.List;
  */
 public class RSSService {
 
-
-
-
-
+	
     private static String getImageUrlFromFeed(Context context, String url) {
 
         try {
@@ -105,8 +97,6 @@ public class RSSService {
             // Anything else was probably another network problem, fail silently
             return null;
         }
-
-
     }
 }
 

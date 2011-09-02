@@ -16,8 +16,17 @@ import java.util.List;
  */
 public class GpodRoid extends RoboApplication {
     
+	/**
+	 * the tag to be referenced in the log cat
+	 */
     public static String LOGTAG = "GPR";
+    
     public static final String BROADCAST_SUBSCRIPTION_CHANGE = "test321";
+    
+    /**
+     * This member is meant to be populated right at the beginning of the application in the "main" function
+     * and will be referenced for the duration of the application
+     */
     public static Context context;
     
     public GpodRoid(){

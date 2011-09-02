@@ -19,7 +19,6 @@ import com.unitedcoders.android.gpodroid.*;
 import com.unitedcoders.android.gpodroid.database.GpodDB;
 import com.unitedcoders.android.gpodroid.services.UpdateService;
 import com.unitedcoders.android.gpodroid.tools.Tools;
-import com.unitedcoders.gpodder.GpodderAPI;
 import roboguice.inject.InjectView;
 
 import java.io.File;
@@ -69,10 +68,6 @@ public class Player extends RoboActivityDefaultMenu implements OnClickListener, 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.playerview);
-
-        // set the GpodderAPI context here so that we will never have to
-        // access it again, otherwise there are calls over
-        GpodderAPI.context = getApplicationContext();
 
         startService(new Intent(getApplicationContext(), UpdateService.class));
 
@@ -276,8 +271,7 @@ public class Player extends RoboActivityDefaultMenu implements OnClickListener, 
         playbackPosition = settings.getInt("SEEKPOSITION", 0);
 
         if (id > 0) {
-            GpodDB db = new GpodDB(getApplicationContext());
-            pce = db.getEpisode(id);
+            pce = GpodDB.getEpisode(id);
         }
     }
 

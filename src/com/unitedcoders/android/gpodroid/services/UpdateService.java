@@ -23,6 +23,8 @@ import java.util.List;
 public class UpdateService extends Service {
 
     private Handler handler = new Handler();
+    
+    private Thread downloadUpdatesThread = null;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -48,9 +50,11 @@ public class UpdateService extends Service {
             return;
 
         }
-
-        Thread thread = new Thread(null, doGetPodcastDownloadInfo, "Background");
-        thread.start();
+        
+        if(downloadUpdatesThread == null){
+	        downloadUpdatesThread = new Thread(null, doGetPodcastDownloadInfo, "Background");
+	        downloadUpdatesThread.start();
+        }
     }
 
     private Runnable doUpdateDownloadList = new Runnable() {
@@ -64,22 +68,25 @@ public class UpdateService extends Service {
             Looper.prepare();
             backgroundPodcastInfoFetcher();
             Looper.loop();
+            
+            // now that the fetching is done, reset the download thread reference
+            downloadUpdatesThread = null;
         }
     };
 
     private void backgroundPodcastInfoFetcher() {
-        GpodderAPI.context = getApplicationContext();
+    	Log.d(GpodRoid.LOGTAG, "Starting background thread to get info.");
         GpodderUpdates podcast = GpodderAPI.getDownloadList();
+        Log.d(GpodRoid.LOGTAG, "Got podcast updates.");
 
         if (podcast == null) {
+        	Toast.makeText(GpodRoid.context, "Failed to fetch updates", Toast.LENGTH_LONG);
             Log.e(GpodRoid.LOGTAG, "cant display downloads, got empty result");
             return;
         }
 
-        GpodDB gpdb = new GpodDB(getApplicationContext());
-
         List<GpodderPodcast> pcl = podcast.getUpdates();
-        gpdb.addPodcasts(pcl);
+        GpodDB.addPodcasts(pcl);
 
         handler.post(doUpdateDownloadList);
 

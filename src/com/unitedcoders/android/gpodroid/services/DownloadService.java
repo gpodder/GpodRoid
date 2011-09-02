@@ -72,10 +72,9 @@ public class DownloadService extends Service {
 
                     download(downloadUrl, storageLocation, fileName, "downloading " + episode.getTitle());
 
-                    GpodDB db = new GpodDB(getApplicationContext());
                     episode.setFile(storageLocation + fileName);
                     episode.setDownloaded(1);
-                    db.updateEpisode(episode);
+                    GpodDB.updateEpisode(episode);
 
                     // get imageurl from url
                     String imageLocation = Tools.getImageUrlFromFeed(getApplicationContext(), episode.getPodcast_url());
@@ -114,7 +113,6 @@ public class DownloadService extends Service {
 
         urlConnection.connect();
 
-        File SDCardRoot = Environment.getExternalStorageDirectory();
         new File(storageLocation).mkdir();
 
 //        File name = new File(podcastURL.toString());

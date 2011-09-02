@@ -1,6 +1,5 @@
 package com.unitedcoders.android.gpodroid;
 
-import android.content.Context;
 import android.content.SharedPreferences;
 
 /**
@@ -42,7 +41,7 @@ public class Preferences {
     }
     
     public static Boolean hasAuthentication(){
-    	return Preferences.encryptedAuthentication.isEmpty();
+    	return Preferences.encryptedAuthentication == "";
     }
     
     public static String getEncryptedAuthentication(){

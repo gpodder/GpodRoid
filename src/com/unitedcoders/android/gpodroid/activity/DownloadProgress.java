@@ -1,11 +1,13 @@
 package com.unitedcoders.android.gpodroid.activity;
 
+import com.unitedcoders.android.gpodroid.GpodRoid;
 import com.unitedcoders.android.gpodroid.R;
 
 import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.ProgressBar;
@@ -43,13 +45,10 @@ public class DownloadProgress extends Activity {
         
 
         final NotificationManager notificationManager = (NotificationManager) getApplicationContext().getSystemService(
-                getApplicationContext().NOTIFICATION_SERVICE);
+                Context.NOTIFICATION_SERVICE);
 
         notificationManager.notify(42, notification);
-
-        //		
-        //		
-//        //		
+	
         Thread download = new Thread() {
 
             @Override

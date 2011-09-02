@@ -25,8 +25,6 @@ import java.util.List;
 
 public class PodcastManager extends RoboTabActivity implements OnClickListener {
 
-    private Context context;
-
     private TabHost mTabHost;
 
     // podcasts in archive
@@ -72,7 +70,6 @@ public class PodcastManager extends RoboTabActivity implements OnClickListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        this.context = getApplicationContext();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.podcast_manager);
 
@@ -82,8 +79,7 @@ public class PodcastManager extends RoboTabActivity implements OnClickListener {
 
         mTabHost.addTab(mTabHost.newTabSpec("tab_podcasts").setIndicator("Podcasts").setContent(R.id.tabmgr_sdcard));
         mTabHost.addTab(mTabHost.newTabSpec("tab_new").setIndicator("New").setContent(R.id.tabmgr_subscriptions));
-        mTabHost.addTab(
-                mTabHost.newTabSpec("tab_search").setIndicator("Search").setContent(R.id.tabmgr_podcast_search));
+        mTabHost.addTab(mTabHost.newTabSpec("tab_search").setIndicator("Search").setContent(R.id.tabmgr_podcast_search));
 
         mTabHost.setCurrentTab(0);
 
@@ -102,18 +98,16 @@ public class PodcastManager extends RoboTabActivity implements OnClickListener {
 
     @Override
     public void onResume() {
-        context.registerReceiver(subscriptionChangeReceiver, filter);
+        GpodRoid.context.registerReceiver(subscriptionChangeReceiver, filter);
         showShows(false);
         showDownloads();
 
         super.onResume();
-
-
     }
 
     @Override
     public void onPause() {
-        context.unregisterReceiver(subscriptionChangeReceiver);
+    	GpodRoid.context.unregisterReceiver(subscriptionChangeReceiver);
         super.onPause();
     }
 
@@ -135,10 +129,9 @@ public class PodcastManager extends RoboTabActivity implements OnClickListener {
 
     private void showEpisodes(String show, boolean flipView) {
 
-        GpodDB db = new GpodDB(getApplicationContext());
-        List<Episode> shows = db.getEpisodes(show);
+        List<Episode> shows = GpodDB.getEpisodes(show);
 
-        podcastAdapter = new PodcastListAdapter(getApplicationContext(), shows);
+        podcastAdapter = new PodcastListAdapter(GpodRoid.context, shows);
         lvPodcasts.setAdapter(podcastAdapter);
 
         if (flipView) {
@@ -154,12 +147,12 @@ public class PodcastManager extends RoboTabActivity implements OnClickListener {
 
                 // ask for download if not present, or start playing
                 final Episode episode = (Episode) parent.getItemAtPosition(position);
-                final Intent downloadService = new Intent(getApplicationContext(), DownloadService.class);
+                //final Intent downloadService = new Intent(GpodRoid.context, DownloadService.class);
                 if (episode.getDownloaded() == 0) {
                     addToDownloadQueue(parent, position);
                 } else {
-                    Toast.makeText(getApplicationContext(), "starting podcast", Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(getApplicationContext(), Player.class);
+                    Toast.makeText(GpodRoid.context, "starting podcast", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(GpodRoid.context, Player.class);
                     Player.pce = episode;
                     Player.switchPodcast = true;
                     startActivity(intent);
@@ -185,8 +178,7 @@ public class PodcastManager extends RoboTabActivity implements OnClickListener {
                         File f = new File(episode.getFile());
                         f.delete();
                         episode.setDownloaded(0);
-                        GpodDB db = new GpodDB(getApplicationContext());
-                        db.updateEpisode(episode);
+                        GpodDB.updateEpisode(episode);
 
                     }
                 });
@@ -212,10 +204,9 @@ public class PodcastManager extends RoboTabActivity implements OnClickListener {
             podcastSubmenu = false;
         }
 
-        GpodDB db = new GpodDB(getApplicationContext());
-        List<String> shows = db.getPodcasts();
+        List<String> shows = GpodDB.getPodcasts();
 
-        showAdapter = new ArrayAdapter(getApplicationContext(), android.R.layout.simple_list_item_1, shows);
+        showAdapter = new ArrayAdapter(GpodRoid.context, android.R.layout.simple_list_item_1, shows);
         lvShows.setAdapter(showAdapter);
         // lvAlbums.setOnClickListener(this);
 
@@ -227,7 +218,6 @@ public class PodcastManager extends RoboTabActivity implements OnClickListener {
                 show = (String) parent.getItemAtPosition(position);
 
                 showEpisodes(show, true);
-
             }
         });
 
@@ -235,10 +225,8 @@ public class PodcastManager extends RoboTabActivity implements OnClickListener {
     }
 
     private void showDownloads() {
-
-        GpodDB db = new GpodDB(getApplicationContext());
-        List<Episode> shows = db.getDownloads();
-        downloadAdapter = new PodcastListAdapter(getApplicationContext(), shows);
+        List<Episode> shows = GpodDB.getDownloads();
+        downloadAdapter = new PodcastListAdapter(GpodRoid.context, shows);
         lvDownloads.setAdapter(downloadAdapter);
 
         lvDownloads.setOnItemClickListener(new OnItemClickListener() {
@@ -259,7 +247,7 @@ public class PodcastManager extends RoboTabActivity implements OnClickListener {
      */
     private void addToDownloadQueue(AdapterView<?> parent, int position) {
         final Episode episode = (Episode) parent.getItemAtPosition(position);
-        final Intent downloadService = new Intent(getApplicationContext(), DownloadService.class);
+        final Intent downloadService = new Intent(GpodRoid.context, DownloadService.class);
 
         // get confirmation for download
         final AlertDialog alert = new AlertDialog.Builder(lvPodcasts.getContext()).create();
@@ -324,15 +312,17 @@ public class PodcastManager extends RoboTabActivity implements OnClickListener {
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.account:
-                Intent account = new Intent(getApplicationContext(), AccountSettings.class);
+            	Log.d(GpodRoid.LOGTAG, "Getting account settings");
+                Intent account = new Intent(GpodRoid.context, AccountSettings.class);
                 startActivity(account);
                 return true;
 //            case R.id.subscriptions:
-//                Intent subscriptions = new Intent(getApplicationContext(), Subscribe.class);
+//                Intent subscriptions = new Intent(GpodRoid.context, Subscribe.class);
 //                startActivity(subscriptions);
 //                return true;
             case R.id.fetch_updates:
-                startService(new Intent(getApplicationContext(), UpdateService.class));
+            	Log.d(GpodRoid.LOGTAG, "Fetching updates");
+                startService(new Intent(GpodRoid.context, UpdateService.class));
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -387,7 +377,7 @@ public class PodcastManager extends RoboTabActivity implements OnClickListener {
     };
 
     private void displayResultsinUI() {
-        lvSearchResults.setAdapter(new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, top25));
+        lvSearchResults.setAdapter(new ArrayAdapter<String>(GpodRoid.context, android.R.layout.simple_list_item_1, top25));
         searching.dismiss();
     }
 
@@ -402,7 +392,7 @@ public class PodcastManager extends RoboTabActivity implements OnClickListener {
             @Override
             public void run() {
                 GpodderAPI.addSubcription(top25hm.get(feed));
-                startService(new Intent(getApplicationContext(), UpdateService.class));
+                startService(new Intent(GpodRoid.context, UpdateService.class));
             }
         }).start();
 

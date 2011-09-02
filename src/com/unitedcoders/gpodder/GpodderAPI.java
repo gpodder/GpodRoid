@@ -7,11 +7,14 @@ import android.util.Log;
 import android.webkit.WebView;
 import com.unitedcoders.android.gpodroid.*;
 import org.apache.commons.io.IOUtils;
+import org.codehaus.jackson.JsonParseException;
+import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
@@ -28,15 +31,15 @@ import java.util.HashMap;
  */
 public class GpodderAPI {
 
+	/**
+	 * the base url for the gpodder.net server
+	 */
     private static final String GPODDER_BASE = "http://gpodder.net";
-    public static final String PREFS_NAME = "gpodroidPrefs";
-    private static GpodderUpdates downloadListResponse = null;
-
+    
     /**
-     * This member is meant to be populated right at the beginning of the application in the "main" function
-     * and will be referenced for the duration of the application
+     * the name of the gpodroid preferences
      */
-    public static Context context = null;
+    public static final String PREFS_NAME = "gpodroidPrefs";
 
     /**
      * The custom User-Agent we send for http requests
@@ -44,15 +47,21 @@ public class GpodderAPI {
      */
     private static String customUserAgent = null;
 
-
-    public static URLConnection createUrlConnection(String urlStr, Boolean useAuthentication, Boolean setOutput) {
-        Log.i(GpodRoid.LOGTAG, "Creating Connection to " + urlStr);
+    /**
+     * this method is used as a helper to create an url connection
+     * @param urlStr
+     * @param useAuthentication
+     * @param setOutput
+     * @return
+     */
+    private static URLConnection createUrlConnection(String urlStr, Boolean useAuthentication, Boolean setOutput) {
+        Log.i(GpodRoid.LOGTAG, "Creating Connection: " + urlStr);
 
         // set custom User-Agent string
         if (customUserAgent == null) {
             try {
-                PackageInfo packageInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
-                String webviewAgent = new WebView(context).getSettings().getUserAgentString();
+                PackageInfo packageInfo = GpodRoid.context.getPackageManager().getPackageInfo(GpodRoid.context.getPackageName(), 0);
+                String webviewAgent = new WebView(GpodRoid.context).getSettings().getUserAgentString();
                 customUserAgent = "GpodRoid " + packageInfo.versionName+" "+webviewAgent;
             } catch (PackageManager.NameNotFoundException e) {
                 Log.e(GpodRoid.LOGTAG, "error setting version info in header", e);
@@ -91,27 +100,44 @@ public class GpodderAPI {
         return stack;
     }
 
+    /**
+     * Gets a list of gpodder updates since today's date
+     * @return
+     */
     public static GpodderUpdates getDownloadList() {
+    	InputStream is = null;
+    	GpodderUpdates updates = null;
         // try to get the updates
         try {
             Long since = (new Date().getTime() / 1000) - 3600 * 24 * 56;
-
-            String urlStr = GPODDER_BASE + "/api/2/updates/USERNAME/DEVICE.json?since=" + since;
-            urlStr = urlStr.replace("USERNAME", Preferences.getUsername());
-            urlStr = urlStr.replace("DEVICE", Preferences.getDevice());
-
+            String urlStr = GPODDER_BASE + "/api/2/updates/" + Preferences.getUsername() + "/" + Preferences.getDevice() + ".json?since=" + since;
             URLConnection conn = createUrlConnection(urlStr, true, false);
-            InputStream is = conn.getInputStream();
-            downloadListResponse = new ObjectMapper().readValue(is, GpodderUpdates.class);
-            is.close();
-        } catch (Exception e) {
-            Log.e(GpodRoid.LOGTAG, "Failed to download subscription list: " + stackTrace(e));
+            is = conn.getInputStream();
+            updates = new ObjectMapper().readValue(is, GpodderUpdates.class);    
+        } 
+        catch (JsonParseException e){
+        	Log.e(GpodRoid.LOGTAG, "Failed to parse subscription list: " + stackTrace(e));
         }
-
-        //experimental, fill sql
-        return downloadListResponse;
+        catch (JsonMappingException e){
+        	Log.e(GpodRoid.LOGTAG, "Failed to map subscription list: " + stackTrace(e));
+        }
+        catch(IOException e){
+        	Log.e(GpodRoid.LOGTAG, "Failed to download the subscription list: " + stackTrace(e));
+        }
+        catch (Exception e) {
+            Log.e(GpodRoid.LOGTAG, "General error getting subscription list: " + stackTrace(e));
+        } 
+        finally{
+        	if(is != null){
+        		try {
+					is.close();
+				} catch (IOException e) {
+					Log.e(GpodRoid.LOGTAG, "Failed to close input stream: " + stackTrace(e));
+				}
+        	}
+        }
+        return updates;
     }
-
 
     public static void createDevice(Context context, String deviceName) {
         String urlStr = String.format(GPODDER_BASE + "/api/2/devices/%s/gpodroid.json", Preferences.getUsername());
