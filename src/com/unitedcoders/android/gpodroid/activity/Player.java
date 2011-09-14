@@ -11,11 +11,11 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.SeekBar;
-import android.widget.TextView;
-import com.unitedcoders.android.gpodroid.*;
+import android.widget.*;
+import com.unitedcoders.android.gpodroid.Episode;
+import com.unitedcoders.android.gpodroid.GpodRoid;
+import com.unitedcoders.android.gpodroid.R;
+import com.unitedcoders.android.gpodroid.RoboActivityDefaultMenu;
 import com.unitedcoders.android.gpodroid.database.GpodDB;
 import com.unitedcoders.android.gpodroid.services.UpdateService;
 import com.unitedcoders.android.gpodroid.tools.Tools;
@@ -101,6 +101,7 @@ public class Player extends RoboActivityDefaultMenu implements OnClickListener, 
     private void play() {
 
         if (pce == null) {
+            Toast.makeText(GpodRoid.context, "please select a podcast first", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -123,6 +124,7 @@ public class Player extends RoboActivityDefaultMenu implements OnClickListener, 
 
 
         if (pce == null) {
+            Toast.makeText(GpodRoid.context, "cannot resume podcast, please choose again", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -140,11 +142,11 @@ public class Player extends RoboActivityDefaultMenu implements OnClickListener, 
 
             btnPlay.setImageResource(android.R.drawable.ic_media_pause);
         } catch (IllegalArgumentException e) {
-            e.printStackTrace();
+            Log.e(GpodRoid.LOGTAG, "failure starting player", e);
         } catch (IllegalStateException e) {
-            e.printStackTrace();
+            Log.e(GpodRoid.LOGTAG, "failure starting player", e);
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.e(GpodRoid.LOGTAG, "failure starting player", e);
         }
 
         tvEpisode.setText(pce.getTitle());
@@ -174,22 +176,33 @@ public class Player extends RoboActivityDefaultMenu implements OnClickListener, 
                 seek(mp.getDuration() / 50);
                 break;
             case R.id.btn_play:
-                if (mp == null) {
-                    play();
-                }
-                if (mp.isPlaying()) {
-                    savePlaybackState();
-                    btnPlay.setImageResource(android.R.drawable.ic_media_play);
-                    mp.pause();
-                } else {
-                    mp.start();
-                    btnPlay.setImageResource(android.R.drawable.ic_media_pause);
-                    progressReader();
-                }
+                startFailsafePlayback();
                 break;
         }
 
     }
+
+    private void startFailsafePlayback() {
+        if (mp == null) {
+            play();
+        }
+
+        // we could still have failed to initialize a player
+        if (mp == null) {
+            Toast.makeText(GpodRoid.context, "please choose a podcast first", Toast.LENGTH_SHORT).show();
+        } else {
+            if (mp.isPlaying()) {
+                savePlaybackState();
+                btnPlay.setImageResource(android.R.drawable.ic_media_play);
+                mp.pause();
+            } else {
+                mp.start();
+                btnPlay.setImageResource(android.R.drawable.ic_media_pause);
+                progressReader();
+            }
+        }
+    }
+
 
     private void seek(int seek) {
         int position = mp.getCurrentPosition();
@@ -203,7 +216,8 @@ public class Player extends RoboActivityDefaultMenu implements OnClickListener, 
         }
     };
 
-    private void updateProgress() {
+    private void updateProgress
+            () {
         if (mp != null) {
             int position = mp.getCurrentPosition();
             barProgress.setProgress(position);
@@ -212,7 +226,8 @@ public class Player extends RoboActivityDefaultMenu implements OnClickListener, 
     }
 
 
-    protected void progressReader() {
+    protected void progressReader
+            () {
         Thread t = new Thread() {
             public void run() {
                 int total = mp.getDuration();
@@ -234,7 +249,10 @@ public class Player extends RoboActivityDefaultMenu implements OnClickListener, 
 
 
     @Override
-    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+    public void onProgressChanged
+            (SeekBar
+                     seekBar, int progress,
+             boolean fromUser) {
         if (fromUser) {
             playbackPosition = progress;
             if (mp != null && mp.isPlaying()) {
@@ -244,16 +262,21 @@ public class Player extends RoboActivityDefaultMenu implements OnClickListener, 
     }
 
     @Override
-    public void onStartTrackingTouch(SeekBar seekBar) {
+    public void onStartTrackingTouch
+            (SeekBar
+                     seekBar) {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
-    public void onStopTrackingTouch(SeekBar seekBar) {
+    public void onStopTrackingTouch
+            (SeekBar
+                     seekBar) {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
-    private void savePlaybackState() {
+    private void savePlaybackState
+            () {
         if (pce != null) {
             // save playback state
             SharedPreferences settings = getApplicationContext().getSharedPreferences("PLAYBACKSTATE", 0);
@@ -265,7 +288,8 @@ public class Player extends RoboActivityDefaultMenu implements OnClickListener, 
         }
     }
 
-    private void loadPlaybackState() {
+    private void loadPlaybackState
+            () {
         SharedPreferences settings = getApplicationContext().getSharedPreferences("PLAYBACKSTATE", 0);
         int id = settings.getInt("PCE", 0);
         playbackPosition = settings.getInt("SEEKPOSITION", 0);
