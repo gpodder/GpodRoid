@@ -86,7 +86,9 @@ public class UpdateService extends Service {
         }
 
         List<GpodderPodcast> pcl = podcast.getUpdates();
-        GpodDB.addPodcasts(pcl);
+        if(pcl != null && pcl.size()>0){
+            GpodDB.addPodcasts(pcl);
+        }
 
         handler.post(doUpdateDownloadList);
 
