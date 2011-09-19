@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.unitedcoders.android.gpodroid" android:versionCode="10"
-          android:versionName="0.4.5">
+          package="com.unitedcoders.android.gpodroid" android:versionCode="11"
+          android:versionName="0.4.6">
     <uses-sdk android:minSdkVersion="7"/><application android:icon="@drawable/icon" android:label="@string/app_name" android:debuggable="true" android:name="GpodRoid">
         <activity android:name=".activity.Player" android:label="@string/app_name">
             <intent-filter>
