@@ -3,6 +3,7 @@ package com.unitedcoders.android.gpodroid.database;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 import com.unitedcoders.android.gpodroid.Episode;
 import com.unitedcoders.android.gpodroid.GpodRoid;
 import com.unitedcoders.gpodder.GpodderPodcast;
@@ -12,16 +13,16 @@ import java.util.List;
 
 public final class GpodDB {
 
-	/**
-	 * holds a reference to the SQLite database
-	 */
+    /**
+     * holds a reference to the SQLite database
+     */
     private static SQLiteDatabase db;
-    
+
     /**
      * The GpodDBHelper class reference
      */
     private static GpodDBHelper dbHelper;
-    
+
     /**
      * the name of the data base table
      */
@@ -31,29 +32,31 @@ public final class GpodDB {
      * static Constructor
      */
     static {
-    	dbHelper = new GpodDBHelper(GpodRoid.context);
-  		db = dbHelper.getWritableDatabase();
-     }
-    
+        dbHelper = new GpodDBHelper(GpodRoid.context);
+        db = dbHelper.getWritableDatabase();
+    }
+
     /**
      * This is just here to prevent the class from being initialized via the private visibility
      */
-    private GpodDB(){
-    	// do nothing on purpose  
+    private GpodDB() {
+        // do nothing on purpose
     }
 
     /**
      * The finalizer to cleanup the database helper(non-Javadoc)
+     *
      * @see java.lang.Object#finalize()
-     
-    protected void finalize() {
-    	if(db != null){
-    		db.close();
-    	}
-    	if(dbHelper != null){
-    		dbHelper.close();
-    	}
-    }*/
+     *      <p/>
+     *      protected void finalize() {
+     *      if(db != null){
+     *      db.close();
+     *      }
+     *      if(dbHelper != null){
+     *      dbHelper.close();
+     *      }
+     *      }
+     */
 
     public static synchronized void addPodcasts(List<GpodderPodcast> pce) {
         for (int i = 0; i < pce.size(); i++) {
@@ -64,7 +67,15 @@ public final class GpodDB {
             // do we know this one?
             String podcast = gpodderPodcast.getPodcast_title();
             String show = gpodderPodcast.getTitle();
-            Cursor c = db.query(DATABASE_TABLE, new String[]{"title"}, "show=? and title=?",  new String[]{show, podcast}, null, null, null, "1");
+
+            if (podcast == null || show == null) {
+                Log.e(GpodRoid.LOGTAG,
+                        String.format("did not insert show because either podcast(%s) or show(%s) missing",
+                                podcast, show));
+                continue;
+            }
+
+            Cursor c = db.query(DATABASE_TABLE, new String[]{"title"}, "show=? and title=?", new String[]{show, podcast}, null, null, null, "1");
 
             if (c.getCount() > 0) {
                 c.close();
@@ -92,7 +103,7 @@ public final class GpodDB {
         values.put("downloaded", episode.getDownloaded());
         values.put("file", episode.getFile());
 
-        db.update(DATABASE_TABLE, values, "show =? and title=?",  new String[]{episode.getTitle(), episode.getPodcast_title()});
+        db.update(DATABASE_TABLE, values, "show =? and title=?", new String[]{episode.getTitle(), episode.getPodcast_title()});
 
     }
 
@@ -122,7 +133,7 @@ public final class GpodDB {
     }
 
     public static Episode getEpisode(int id) {
-        Cursor c = db.query(DATABASE_TABLE, new String[]{"show, title, downloaded, url, file, _id, podcast_url"},"_id=?", new String[]{Integer.toString(id)}, null, null, null);
+        Cursor c = db.query(DATABASE_TABLE, new String[]{"show, title, downloaded, url, file, _id, podcast_url"}, "_id=?", new String[]{Integer.toString(id)}, null, null, null);
 
         Episode pce = new Episode(new GpodderPodcast());
         if (c.getCount() != 0) {
@@ -160,7 +171,7 @@ public final class GpodDB {
     }
 
     public static List<Episode> getDownloads() {
-        Cursor c = db.query(DATABASE_TABLE, new String[]{"show, title, downloaded, url, file, _id, podcast_url"},"downloaded=?", new String[]{"0"}, null, null, "released desc", "20");
+        Cursor c = db.query(DATABASE_TABLE, new String[]{"show, title, downloaded, url, file, _id, podcast_url"}, "downloaded=?", new String[]{"0"}, null, null, "released desc", "20");
 
         ArrayList<Episode> podcasts = new ArrayList<Episode>();
 
@@ -185,6 +196,6 @@ public final class GpodDB {
     }
 
     public static void wipeClean() {
-        db.delete(DATABASE_TABLE, "_id > ?" ,new String[]{"-1"});
+        db.delete(DATABASE_TABLE, "_id > ?", new String[]{"-1"});
     }
 }
